@@ -1,13 +1,153 @@
 <ion-header [translucent]="true">
   <ion-toolbar>
-    <ion-title>
-      Blank
-    </ion-title>
+    <ion-title>Dashboard</ion-title>
+
+    <ion-buttons slot="start">
+      <ion-button id="trigger-button">
+        <ion-icon color="dark" name="person-circle"></ion-icon>
+      </ion-button>
+      <ion-modal trigger="trigger-button" [breakpoints]="[0, 0.5, 1]" [initialBreakpoint]="0.5">
+        <ng-template>
+          <ion-header>
+            <ion-toolbar>
+              <ion-title>Settings</ion-title>
+              <ion-buttons slot="end">
+                <ion-button onclick="dismissModal()">Close</ion-button>
+              </ion-buttons>
+            </ion-toolbar>
+          </ion-header>
+
+          <ion-content forceOverscroll="false">
+            <ion-grid>
+              <ion-row>
+                <ion-col>
+                  <ion-card id="update-credentials" class="ion-no-margin ion-activatable ripple-parent" style="height: 100%;">
+                    <ion-ripple-effect></ion-ripple-effect>
+                    <ion-grid>
+                      <ion-row>
+                        <ion-card-header>
+                          <ion-card-title><h5 class="ion-no-margin">Update credentials</h5></ion-card-title>
+                        </ion-card-header>
+                      </ion-row>
+                    </ion-grid>
+                  </ion-card>
+
+                  <ion-modal trigger="update-credentials" [breakpoints]="[0, 1]" [initialBreakpoint]="1">
+                    <ng-template>
+                      <ion-header>
+                        <ion-toolbar>
+                          <ion-title>Update credentials</ion-title>
+                          <ion-buttons slot="end">
+                            <ion-button onclick="dismissModal()">Close</ion-button>
+                          </ion-buttons>
+                        </ion-toolbar>
+                      </ion-header>
+
+                      <ion-content>
+                        <ion-grid>
+                          <ion-row>
+                            <ion-col>
+                              <ion-item>
+                                <ion-label position="stacked">Username</ion-label>
+                                <ion-input placeholder="Enter your username" value="dmnktrn"></ion-input>
+                              </ion-item>
+                            </ion-col>
+                          </ion-row>
+                          <ion-row>
+                            <ion-col>
+                              <ion-item>
+                                <ion-label position="stacked">Email</ion-label>
+                                <ion-input placeholder="Enter your email" value="d.tran@htlkrems.at"></ion-input>
+                              </ion-item>
+                            </ion-col>
+                          </ion-row>
+                          <ion-row>
+                            <ion-col>
+                              <ion-item>
+                                <ion-label position="stacked">Gender</ion-label>
+                                <ion-select placeholder="Select One" value="male">
+                                  <ion-select-option value="male">Male</ion-select-option>
+                                  <ion-select-option value="female">Female</ion-select-option>
+                                  <ion-select-option value="other">Other</ion-select-option>
+                                </ion-select>
+                              </ion-item>
+                            </ion-col>
+                          </ion-row>
+                          <ion-row>
+                            <ion-col>
+                              <ion-item>
+                                <ion-label position="stacked">Country</ion-label>
+                                <ion-select placeholder="Select One" value="austria">
+                                  <ion-select-option value="austria">Austria</ion-select-option>
+                                  <ion-select-option value="germany">Germany</ion-select-option>
+                                  <ion-select-option value="swiss">Switzerland</ion-select-option>
+                                </ion-select>
+                              </ion-item>
+                            </ion-col>
+                          </ion-row>
+                          <ion-row>
+                            <ion-col>
+                              <ion-item>
+                                <ion-label position="stacked">Birth Date</ion-label>
+                                <ion-input placeholder="Enter birth date" value="29 June 2003"></ion-input>
+                              </ion-item>
+                            </ion-col>
+                          </ion-row>
+                          <ion-row>
+                            <ion-col class="ion-text-center">
+                              <ion-button style="width: 90%;">
+                                Save changes
+                              </ion-button>
+                            </ion-col>
+                          </ion-row>
+                        </ion-grid>
+                      </ion-content>
+                    </ng-template>
+                  </ion-modal>
+                </ion-col>
+              </ion-row>
+              <ion-row>
+                <ion-col>
+                  <ion-card class="ion-no-margin ion-activatable ripple-parent" style="height: 100%;">
+                    <ion-ripple-effect></ion-ripple-effect>
+                    <ion-card-header>
+                      <ion-card-title><h5 class="ion-no-margin">Change Password</h5></ion-card-title>
+                    </ion-card-header>
+                  </ion-card>
+                </ion-col>
+              </ion-row>
+              <ion-row>
+                <ion-col>
+                  <ion-card class="ion-no-margin ion-activatable ripple-parent" style="height: 100%;">
+                    <ion-ripple-effect></ion-ripple-effect>
+                    <ion-card-header>
+                      <ion-card-title><h5 class="ion-no-margin">Delete Account</h5></ion-card-title>
+                    </ion-card-header>
+                  </ion-card>
+                </ion-col>
+              </ion-row>
+              <ion-row>
+                <ion-col>
+                  <ion-button routerLink="/login" style="width: 100%;" color="danger">Logout</ion-button>
+                </ion-col>
+              </ion-row>
+            </ion-grid>
+          </ion-content>
+        </ng-template>
+      </ion-modal>
+    </ion-buttons>
+
+    <ion-buttons slot="end">
+      <ion-toggle color="dark"></ion-toggle>
+    </ion-buttons>
+
+    <ion-progress-bar value="0.3"></ion-progress-bar> <!--type="indeterminate"-->
   </ion-toolbar>
 </ion-header>
 
-<ion-content [fullscreen]="true">
-  <ion-header collapse="condense">
+<ion-content forceOverscroll="false">
+
+  <!--<ion-header collapse="condense">
     <ion-toolbar>
       <ion-title size="large">Blank</ion-title>
     </ion-toolbar>
@@ -16,5 +156,116 @@
   <div id="container">
     <strong>Ready to create an app?</strong>
     <p>Start with Ionic <a target="_blank" rel="noopener noreferrer" href="https://ionicframework.com/docs/components">UI Components</a></p>
-  </div>
+  </div>-->
+
+  <ion-grid>
+    <!--<ion-row>
+      <ion-col>
+        <h3>Good morning, dmnktrn!</h3>
+      </ion-col>
+    </ion-row>-->
+
+    <ion-row>
+      <ion-col>
+        <ion-card class="ion-no-margin ion-activatable ripple-parent">
+          <ion-ripple-effect></ion-ripple-effect>
+          <!--ion-card-header>
+            <ion-card-title>Statistics</ion-card-title>
+          </ion-card-header>-->
+
+          <ion-card-subtitle>
+            <ion-item>
+              <ion-label>Exercise type</ion-label>
+              <ion-select placeholder="None">
+                <div *ngFor="let item of sortAfterName(exerciseTypes)">
+                  <ion-select-option value="{{ item.exercise_type_id }}">{{ item.exercise_type }}</ion-select-option>
+                </div>
+                <<!--ion-select-option value="benchpress">Bench press</ion-select-option>
+                <ion-select-option value="squat">Squat</ion-select-option>
+                <ion-select-option value="deadlift">Deadlift</ion-select-option>-->
+              </ion-select>
+            </ion-item>
+          </ion-card-subtitle>
+
+
+          <ion-card-content>
+            <canvas #lineCanvas style="height:200px"></canvas>
+            <!--Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet.-->
+          </ion-card-content>
+        </ion-card>
+      </ion-col>
+    </ion-row>
+
+    <ion-row>
+      <ion-col>
+        <ion-card class="ion-no-margin ion-activatable ripple-parent" style="height: 100%;">
+          <ion-ripple-effect></ion-ripple-effect>
+          <ion-card-header>
+            <ion-card-title>Friends</ion-card-title>
+            <ion-text>current friends: 11</ion-text>
+          </ion-card-header>
+
+          <ion-card-content>
+            <ion-badge style="width: 100%;" color="warning">1 new friend request</ion-badge>
+          </ion-card-content>
+        </ion-card>
+      </ion-col>
+
+      <ion-col size="5">
+        <ion-card class="ion-no-margin ion-activatable ripple-parent" style="height: 100%;">
+          <ion-ripple-effect></ion-ripple-effect>
+          <ion-card-header>
+            <ion-card-title>Weight</ion-card-title>
+            <ion-text>current aim: hold</ion-text>
+          </ion-card-header>
+
+          <ion-card-content>
+            <ion-text color="danger" class="ion-text-center">
+              <h1><ion-icon name="arrow-up"></ion-icon> 1.5kg</h1>
+            </ion-text>
+          </ion-card-content>
+        </ion-card>
+      </ion-col>
+    </ion-row>
+
+    <ion-row>
+      <ion-col>
+        <ion-card class="ion-no-margin ion-activatable ripple-parent">
+          <ion-ripple-effect></ion-ripple-effect>
+          <ion-card-header>
+            <ion-card-title>Leaderboard (Top 3)</ion-card-title>
+          </ion-card-header>
+
+          <ion-card-content>
+            <ion-row *ngFor="let item of friends.slice(0, 3); index as rank" class="rankings">
+              <ion-col size="2">
+                <b># {{ rank+1 }}</b>
+              </ion-col>
+              <ion-col>
+                <span>{{ item.username }}</span>
+              </ion-col>
+              <ion-col size="4" class="ion-text-end">
+                <span>{{ item.score }} Pkt.</span>
+              </ion-col>
+            </ion-row>
+          </ion-card-content>
+        </ion-card>
+      </ion-col>
+    </ion-row>
+  </ion-grid>
+
+  <ion-fab horizontal="end" vertical="bottom" slot="fixed">
+    <ion-fab-button>
+      <ion-icon name="add"></ion-icon>
+    </ion-fab-button>
+    <ion-fab-list side="top">
+      <ion-fab-button color="secondary" (click)="add()">
+        <ion-icon name="barbell"></ion-icon>
+      </ion-fab-button>
+      <ion-fab-button color="secondary">
+        <ion-icon name="scale"></ion-icon>
+      </ion-fab-button>
+    </ion-fab-list>
+  </ion-fab>
+
 </ion-content>
