@@ -1,4 +1,4 @@
-<ion-header [translucent]="true">
+<ion-header>
   <ion-toolbar>
     <ion-title>Dashboard</ion-title>
 
@@ -103,7 +103,7 @@
                           </ion-row>
                           <ion-row>
                             <ion-col class="ion-text-center">
-                              <ion-button style="width: 90%;">
+                              <ion-button style="width: 100%;">
                                 Save changes
                               </ion-button>
                             </ion-col>
@@ -116,12 +116,62 @@
               </ion-row>
               <ion-row>
                 <ion-col>
-                  <ion-card class="ion-no-margin ion-activatable ripple-parent" style="height: 100%;">
+                  <ion-card id="change-password" class="ion-no-margin ion-activatable ripple-parent" style="height: 100%;">
                     <ion-ripple-effect></ion-ripple-effect>
                     <ion-card-header>
                       <ion-card-title><h5 class="ion-no-margin">Change password</h5></ion-card-title>
                     </ion-card-header>
                   </ion-card>
+
+                  <ion-modal trigger="change-password" [breakpoints]="[0, 1]" [initialBreakpoint]="1">
+                    <ng-template>
+                      <ion-header>
+                        <ion-toolbar>
+                          <ion-title>Change password</ion-title>
+                          <ion-buttons slot="end">
+                            <ion-button (click)="dismissModal()">Close</ion-button>
+                          </ion-buttons>
+                        </ion-toolbar>
+                      </ion-header>
+
+                      <ion-content>
+                        <ion-grid>
+                          <ion-row>
+                            <ion-col>
+                              <ion-item>
+                                <ion-label position="stacked">Old password</ion-label>
+                                <ion-input type="password" placeholder="Enter your old password" [(ngModel)]="pwData.old_password"></ion-input>
+                              </ion-item>
+                            </ion-col>
+                          </ion-row>
+                          <ion-row>
+                            <ion-col>
+                              <ion-item>
+                                <ion-label position="stacked">New password</ion-label>
+                                <ion-input type="password" placeholder="Enter your new password" [(ngModel)]="pwData.new_password"></ion-input>
+                              </ion-item>
+                            </ion-col>
+                          </ion-row>
+                          <ion-row>
+                            <ion-col>
+                              <ion-item>
+                                <ion-label position="stacked">Confirm new password</ion-label>
+                                <ion-input type="password" placeholder="Re-enter your new password" [(ngModel)]="pwData.c_new_password"></ion-input>
+                              </ion-item>
+                            </ion-col>
+                          </ion-row>
+                          <ion-row>
+                            <ion-col class="ion-text-center">
+                              <ion-button style="width: 100%;">
+                                Save changes
+                              </ion-button>
+                            </ion-col>
+                          </ion-row>
+                        </ion-grid>
+                      </ion-content>
+                    </ng-template>
+                  </ion-modal>
+
                 </ion-col>
               </ion-row>
               <ion-row>
@@ -146,7 +196,7 @@
     </ion-buttons>
 
     <ion-buttons slot="end">
-      <ion-button>
+      <ion-button (click)="toggleTheme()">
         <ion-icon size="large" color="dark" name="contrast-outline"></ion-icon>
       </ion-button>
     </ion-buttons>
@@ -224,7 +274,7 @@
         <ion-card class="ion-no-margin ion-activatable ripple-parent" routerLink="/leaderboard">
           <ion-ripple-effect></ion-ripple-effect>
           <ion-card-header>
-            <ion-card-title>Leaderboard (Top 3)</ion-card-title>
+            <ion-card-title>Leaderboard</ion-card-title>
           </ion-card-header>
 
           <ion-card-content>

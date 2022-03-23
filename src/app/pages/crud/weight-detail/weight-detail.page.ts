@@ -20,6 +20,15 @@ export class WeightDetailPage implements AfterViewInit {
     Chart.register(...registerables);
   }
 
+  segmentChanged() {
+    this.xLabel = [];
+    this.yData = [];
+
+    for (let i = 0; i < 14; i++) {
+      this.add();
+    }
+  }
+
   ngAfterViewInit() {
     this.lineChartMethod();
 

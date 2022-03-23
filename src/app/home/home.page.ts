@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/naming-convention */
 import { AfterViewInit, Component, ElementRef, ViewChild } from '@angular/core';
 import { Chart, registerables } from 'chart.js';
 import { CrudService } from '../services/api/crud.service';
@@ -35,7 +36,13 @@ export class HomePage implements AfterViewInit {
     gender: '',
     country: '',
     // eslint-disable-next-line @typescript-eslint/naming-convention
-    date_of_birth: format(new Date(), 'yyyy-MM-dd')
+    date_of_birth: format(new Date(), 'yyyy-mm-dd')
+  };
+
+  pwData = {
+    old_password: '',
+    new_password: '',
+    c_new_password: ''
   };
 
   exerciseTypes = [];
@@ -86,6 +93,19 @@ export class HomePage implements AfterViewInit {
     await Storage.remove({ key: 'refresh_token' });
 
     this.navCtrl.navigateForward('/login');
+  }
+
+  async toggleTheme() {
+    const colorTheme = await (await Storage.get({ key: 'color_theme' })).value;
+
+    if (colorTheme === 'light') {
+      document.body.setAttribute('color-theme', 'dark');
+      await Storage.set({key: 'color_theme', value: 'dark'});
+    }
+    else {
+      document.body.setAttribute('color-theme', 'light');
+      await Storage.set({key: 'color_theme', value: 'light'});
+    }
   }
 
   async fetchExerciseTypes() {

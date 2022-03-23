@@ -33,7 +33,7 @@ export class LoginPage implements OnInit {
     gender: '',
     country: '',
     // eslint-disable-next-line @typescript-eslint/naming-convention
-    date_of_birth: format(new Date(), 'yyyy-MM-dd')
+    date_of_birth: format(new Date(), 'yyyy-mm-dd')
   };
 
   constructor(
@@ -45,6 +45,8 @@ export class LoginPage implements OnInit {
   ) { }
 
   ngOnInit() {
+    this.initColorTheme();
+
     this.authService.getCountries()
       .subscribe(data => this.countries = data.data);
 
@@ -52,6 +54,22 @@ export class LoginPage implements OnInit {
       .subscribe(data => this.genders = data.data);
 
     this.rememberMe();
+  }
+
+  async initColorTheme() {
+    const colorTheme = await (await Storage.get({ key: 'color_theme' })).value;
+
+    if (colorTheme === null) {
+      await Storage.set({key: 'color_theme', value: 'light'});
+    }
+    else {
+      if (colorTheme === 'light') {
+        document.body.setAttribute('color-theme', 'light');
+      }
+      else {
+        document.body.setAttribute('color-theme', 'dark');
+      }
+    }
   }
 
   async rememberMe() {
@@ -107,10 +125,10 @@ export class LoginPage implements OnInit {
 
     this.authService.login(this.userCredentials).subscribe(
       async res => {
+        this.loaderService.dismissLoading();
+
         await Storage.set({key: 'access_token', value: 'Bearer ' + res.data.tokens.access_token});
         await Storage.set({key: 'refresh_token', value: res.data.tokens.refresh_token});
-
-        this.loaderService.dismissLoading();
 
         this.navCtrl.navigateForward('/home');
 
