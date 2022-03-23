@@ -35,3 +35,19 @@ ion-select::part(placeholder) {
   color: grey;
   opacity: 1;
 }
+
+ion-datetime {
+  height: auto;
+  width: auto;
+
+  max-width: 350px;
+}
+
+.bday-modal {
+  --width: 290px;
+  --height: 382px;
+}
+
+.bday-modal ion-datetime {
+  height: 382px;
+}

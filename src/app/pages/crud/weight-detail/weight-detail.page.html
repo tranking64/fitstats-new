@@ -1,0 +1,137 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-title>Bodyweight</ion-title>
+
+    <ion-buttons slot="start">
+      <ion-back-button></ion-back-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <ion-segment (ionChange)="segmentChanged($event)" value="week">
+    <ion-segment-button value="week">
+      <ion-label>Last 14 days</ion-label>
+    </ion-segment-button>
+    <ion-segment-button value="year">
+      <ion-label>Last 12 months</ion-label>
+    </ion-segment-button>
+  </ion-segment>
+
+  <ion-grid>
+
+    <ion-row>
+      <ion-col>
+        <ion-card class="ion-no-margin">
+          <ion-card-header>
+            <ion-card-title>Statistics</ion-card-title>
+          </ion-card-header>
+
+          <ion-card-content>
+            <canvas #lineCanvas style="height: 200px"></canvas>
+          </ion-card-content>
+        </ion-card>
+      </ion-col>
+    </ion-row>
+    <ion-row>
+      <ion-col>
+        <ion-card class="ion-no-margin">
+          <ion-card-header>
+            <ion-card-title>Bodyweight last 14 days</ion-card-title>
+          </ion-card-header>
+
+          <ion-card-content>
+            <div>
+              <ion-row class="listing">
+                <ion-col size="5">22 March</ion-col>
+                <ion-col>40kg</ion-col>
+                <ion-col class="ion-text-end">
+                  <ion-icon name="pencil"></ion-icon>
+                  <ion-icon color="danger" name="trash"></ion-icon>
+                </ion-col>
+              </ion-row>
+
+              <ion-row class="listing">
+                <ion-col size="5">21 March</ion-col>
+                <ion-col>42.5kg</ion-col>
+                <ion-col class="ion-text-end">
+                  <ion-icon name="pencil"></ion-icon>
+                  <ion-icon color="danger" name="trash"></ion-icon>
+                </ion-col>
+              </ion-row>
+
+              <ion-row class="listing">
+                <ion-col size="5">20 March</ion-col>
+                <ion-col>45kg</ion-col>
+                <ion-col class="ion-text-end">
+                  <ion-icon name="pencil"></ion-icon>
+                  <ion-icon color="danger" name="trash"></ion-icon>
+                </ion-col>
+              </ion-row>
+
+              <ion-row class="listing">
+                <ion-col size="5">19 March</ion-col>
+                <ion-col>40kg</ion-col>
+                <ion-col class="ion-text-end">
+                  <ion-icon name="pencil"></ion-icon>
+                  <ion-icon color="danger" name="trash"></ion-icon>
+                </ion-col>
+              </ion-row>
+
+              <ion-row class="listing">
+                <ion-col size="5">18 March</ion-col>
+                <ion-col>42.5kg</ion-col>
+                <ion-col class="ion-text-end">
+                  <ion-icon name="pencil"></ion-icon>
+                  <ion-icon color="danger" name="trash"></ion-icon>
+                </ion-col>
+              </ion-row>
+
+              <ion-row class="listing">
+                <ion-col size="5">17 March</ion-col>
+                <ion-col>45kg</ion-col>
+                <ion-col class="ion-text-end">
+                  <ion-icon name="pencil"></ion-icon>
+                  <ion-icon color="danger" name="trash"></ion-icon>
+                </ion-col>
+              </ion-row>
+
+            <ion-row class="listing">
+              <ion-col size="5">16 March</ion-col>
+              <ion-col>40kg</ion-col>
+              <ion-col class="ion-text-end">
+                <ion-icon name="pencil"></ion-icon>
+                <ion-icon color="danger" name="trash"></ion-icon>
+              </ion-col>
+            </ion-row>
+
+            <ion-row class="listing">
+              <ion-col size="5">15 March</ion-col>
+              <ion-col>64.3kg</ion-col>
+              <ion-col class="ion-text-end">
+                <ion-icon name="pencil"></ion-icon>
+                <ion-icon color="danger" name="trash"></ion-icon>
+              </ion-col>
+            </ion-row>
+
+            <ion-row class="listing">
+              <ion-col size="5">14 March</ion-col>
+              <ion-col>65kg</ion-col>
+              <ion-col class="ion-text-end">
+                <ion-icon name="pencil"></ion-icon>
+                <ion-icon color="danger" name="trash"></ion-icon>
+              </ion-col>
+            </ion-row>
+            </div>
+          </ion-card-content>
+        </ion-card>
+      </ion-col>
+    </ion-row>
+  </ion-grid>
+
+  <ion-fab vertical="bottom" horizontal="end" slot="fixed">
+    <ion-fab-button color="secondary" (click)="add()">
+      <ion-icon name="scale"></ion-icon>
+    </ion-fab-button>
+  </ion-fab>
+</ion-content>

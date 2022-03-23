@@ -2,6 +2,9 @@ import { AfterViewInit, Component, ElementRef, ViewChild } from '@angular/core';
 import { Chart, registerables } from 'chart.js';
 import { CrudService } from '../services/api/crud.service';
 import { Storage } from '@capacitor/storage';
+import { ModalController, NavController } from '@ionic/angular';
+import { format, parseISO } from 'date-fns';
+import { AuthService } from '../services/api/auth.service';
 
 @Component({
   selector: 'app-home',
@@ -16,17 +19,73 @@ export class HomePage implements AfterViewInit {
   xLabel = [];
   yData = [];
 
+  genders = [];
+  countries = [];
+
   friends = [
-    { username: 'AmOasch6', score: 1450 },
-    { username: 'very_bad', score: 1300 },
-    { username: 'hoggst rider', score: 860 },
-    { username: 'aleggs', score: 500 }
+    { username: 'AmOasch6', units: 16 },
+    { username: 'very_bad', units: 12 },
+    { username: 'hoggst rider', units: 7 },
+    { username: 'aleggs', units: 5 }
   ];
 
-  exerciseTypes = [];
+  userData = {
+    username: '',
+    email: '',
+    gender: '',
+    country: '',
+    // eslint-disable-next-line @typescript-eslint/naming-convention
+    date_of_birth: format(new Date(), 'yyyy-MM-dd')
+  };
 
-  constructor(private crudService: CrudService) {
+  exerciseTypes = [];
+  formattedDate = '';
+
+  constructor(
+    private crudService: CrudService,
+    private navCtrl: NavController,
+    private authService: AuthService,
+    private modalCtrl: ModalController
+  ) {
+    this.fetchExerciseTypes();
+
+    this.authService.getCountries()
+      .subscribe(data => this.countries = data.data);
+
+    this.authService.getGenders()
+      .subscribe(data => this.genders = data.data);
+
     Chart.register(...registerables);
+  }
+
+  dateChanged(value) {
+    this.userData.date_of_birth = value;
+    this.formattedDate = format(parseISO(value), 'dd MMMM yyyy');
+  }
+
+  async fetchUserdata() {
+    const accessToken = await (await Storage.get({ key: 'access_token' })).value;
+
+    this.authService.getUserdata(accessToken).subscribe(
+      res => {
+        this.userData.username = res.username;
+        this.userData.email = res.email;
+        this.userData.gender = res.gender.gender_type;
+        this.userData.country = res.country.country_type;
+        this.userData.date_of_birth = res.date_of_birth;
+
+        this.formattedDate = format(parseISO(res.date_of_birth), 'dd MMMM yyyy');
+      }
+    );
+  }
+
+  async logout() {
+    this.dismissModal();
+
+    await Storage.remove({ key: 'access_token' });
+    await Storage.remove({ key: 'refresh_token' });
+
+    this.navCtrl.navigateForward('/login');
   }
 
   async fetchExerciseTypes() {
@@ -36,9 +95,18 @@ export class HomePage implements AfterViewInit {
       .subscribe(res => this.exerciseTypes = res.data);
   }
 
-  ngAfterViewInit() {
-    this.fetchExerciseTypes();
+  ionViewWillEnter() {
+    this.fetchUserdata();
 
+    this.xLabel = [];
+    this.yData = [];
+
+    for (let i = 0; i < 14; i++) {
+      this.add();
+    }
+  }
+
+  ngAfterViewInit() {
     this.lineChartMethod();
 
     for (let i = 0; i < 14; i++) {
@@ -52,6 +120,10 @@ export class HomePage implements AfterViewInit {
 
     this.lineChart.destroy();
     this.lineChartMethod();
+  }
+
+  dismissModal() {
+    this.modalCtrl.dismiss();
   }
 
   lineChartMethod() {
@@ -89,5 +161,32 @@ export class HomePage implements AfterViewInit {
 
   sortAfterName(arr) {
     return arr.sort((a, b) => (a.country_type > b.country_type) ? 1 : -1);
+  }
+
+  toTitleCase = (phrase) =>
+    phrase
+      .toLowerCase()
+      .split(' ')
+      .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+      .join(' ');
+
+  getGreeting() {
+    const currentDate = new Date();
+    let greeting = '';
+
+    if (currentDate.getHours() < 5) {
+      greeting = 'Gute evening';
+    }
+    else if(currentDate.getHours() < 12) {
+      greeting = 'Good morning';
+    }
+    else if (currentDate.getHours() < 18) {
+      greeting = 'Good afternoon';
+    }
+    else {
+      greeting = 'Good evening';
+    }
+
+    return greeting;
   }
 }

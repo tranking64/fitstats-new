@@ -1,7 +1,10 @@
 import { Component, OnInit } from '@angular/core';
-import { NavController } from '@ionic/angular';
+import { ModalController, NavController } from '@ionic/angular';
 import { AuthService } from 'src/app/services/api/auth.service';
 import { Storage } from '@capacitor/storage';
+import { LoaderService } from 'src/app/services/helpers/loader.service';
+import { AlertService } from 'src/app/services/helpers/alert.service';
+import { format, parseISO } from 'date-fns';
 
 @Component({
   selector: 'app-login',
@@ -9,6 +12,8 @@ import { Storage } from '@capacitor/storage';
   styleUrls: ['./login.page.scss'],
 })
 export class LoginPage implements OnInit {
+
+  formattedDate = '';
 
   countries = [];
   genders = [];
@@ -28,12 +33,15 @@ export class LoginPage implements OnInit {
     gender: '',
     country: '',
     // eslint-disable-next-line @typescript-eslint/naming-convention
-    date_of_birth: ''
+    date_of_birth: format(new Date(), 'yyyy-MM-dd')
   };
 
   constructor(
     private authService: AuthService,
-    private navCtrl: NavController
+    private navCtrl: NavController,
+    private loaderService: LoaderService,
+    private alertService: AlertService,
+    private modalCtrl: ModalController
   ) { }
 
   ngOnInit() {
@@ -42,27 +50,76 @@ export class LoginPage implements OnInit {
 
     this.authService.getGenders()
       .subscribe(data => this.genders = data.data);
+
+    this.rememberMe();
+  }
+
+  async rememberMe() {
+    const refreshToken = await (await Storage.get({ key: 'refresh_token' })).value;
+
+    if (refreshToken != null) {
+      this.loaderService.presentLoading();
+
+      this.authService.refreshLogin(refreshToken).subscribe(
+        async res => {
+          await Storage.set({key: 'access_token', value: 'Bearer ' + res.data.tokens.access_token});
+          await Storage.set({key: 'refresh_token', value: res.data.tokens.refresh_token});
+
+          this.loaderService.dismissLoading();
+
+          this.navCtrl.navigateForward('/home');
+        },
+        async err => {
+          await Storage.remove({ key: 'access_token' });
+          await Storage.remove({ key: 'refresh_token' });
+
+          this.loaderService.dismissLoading();
+
+          this.alertService.presentSimpleAlert('Token expired', 'Please enter your credentials again!');
+        }
+      );
+    }
+  }
+
+  dismissModal() {
+    this.modalCtrl.dismiss();
+  }
+
+  dateChanged(value) {
+    this.tmpUser.date_of_birth = value;
+    this.formattedDate = format(parseISO(value), 'dd MMMM yyyy');
   }
 
   createAcc() {
+    this.loaderService.presentLoading();
+
     this.authService.signup(this.tmpUser).subscribe(
-      res => console.log(res), // close modal needed
-      err => console.log(err)
+      res => {
+        this.loaderService.dismissLoading();
+        this.dismissModal();
+      },
+      err => this.loaderService.dismissLoading()
     );
   }
 
   signin() {
+    this.loaderService.presentLoading();
+
     this.authService.login(this.userCredentials).subscribe(
       async res => {
         await Storage.set({key: 'access_token', value: 'Bearer ' + res.data.tokens.access_token});
         await Storage.set({key: 'refresh_token', value: res.data.tokens.refresh_token});
+
+        this.loaderService.dismissLoading();
 
         this.navCtrl.navigateForward('/home');
 
         this.userCredentials.email = '';
         this.userCredentials.password = '';
       },
-      err => console.log(err)
+      err => {
+        this.loaderService.dismissLoading();
+      }
     );
   }
 

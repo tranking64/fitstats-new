@@ -15,6 +15,22 @@ const routes: Routes = [
     path: 'login',
     loadChildren: () => import('./pages/auth/login/login.module').then( m => m.LoginPageModule)
   },
+  {
+    path: 'exercise-detail',
+    loadChildren: () => import('./pages/crud/exercise-detail/exercise-detail.module').then( m => m.ExerciseDetailPageModule)
+  },
+  {
+    path: 'weight-detail',
+    loadChildren: () => import('./pages/crud/weight-detail/weight-detail.module').then( m => m.WeightDetailPageModule)
+  },
+  {
+    path: 'leaderboard',
+    loadChildren: () => import('./pages/crud/leaderboard/leaderboard.module').then( m => m.LeaderboardPageModule)
+  },
+  {
+    path: 'friends',
+    loadChildren: () => import('./pages/crud/friends/friends.module').then( m => m.FriendsPageModule)
+  },
 ];
 
 @NgModule({

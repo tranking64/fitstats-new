@@ -1,0 +1,21 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-title>Leaderboard</ion-title>
+
+    <ion-buttons slot="start">
+      <ion-back-button></ion-back-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <!-- add disabled if no friends-->
+  <ion-segment (ionChange)="segmentChanged($event)" value="all">
+    <ion-segment-button value="all">
+      <ion-label>Everyone</ion-label>
+    </ion-segment-button>
+    <ion-segment-button value="friends">
+      <ion-label>Friends only</ion-label>
+    </ion-segment-button>
+  </ion-segment>
+</ion-content>

@@ -59,7 +59,7 @@
         <ion-toolbar>
           <ion-title>Sign up</ion-title>
           <ion-buttons slot="end">
-            <ion-button onclick="dismissModal()">Close</ion-button>
+            <ion-button (click)="dismissModal()">Close</ion-button>
           </ion-buttons>
         </ion-toolbar>
       </ion-header>
@@ -126,8 +126,17 @@
             <ion-col>
               <ion-item>
                 <ion-label position="stacked">Birth Date</ion-label>
-                <ion-input placeholder="Enter birth date" [(ngModel)]="tmpUser.date_of_birth"></ion-input>
+                <ion-input placeholder="Enter birth date" id="birthdate-modal" [(ngModel)]="formattedDate"></ion-input>
               </ion-item>
+
+              <ion-modal class="bday-modal" trigger="birthdate-modal">
+                <ng-template>
+                  <ion-content force-overscroll="false">
+                    <ion-datetime locale="en-EN" #datetime presentation="date" [value]="tmpUser.date_of_birth" (ionChange)="dateChanged(datetime.value)" showDefaultButtons="true"></ion-datetime>
+                  </ion-content>
+                </ng-template>
+              </ion-modal>
+
             </ion-col>
           </ion-row>
           <ion-row>

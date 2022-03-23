@@ -21,6 +21,22 @@ export class AuthService {
     return this.http.post('https://fitstats.mauexe.com/api/auth/login', userCredentials, {headers});
   }
 
+  refreshLogin(refreshToken): Observable<any> {
+    const headers = new HttpHeaders()
+      .set('Content-Type', 'application/json');
+
+    // eslint-disable-next-line @typescript-eslint/naming-convention
+    return this.http.post('https://fitstats.mauexe.com/api/auth/refresh', {refresh_token: refreshToken}, {headers});
+  }
+
+  getUserdata(accessToken): Observable<any> {
+    const headers = new HttpHeaders()
+      .set('Content-Type', 'application/json')
+      .set('Authorization', accessToken);
+
+    return this.http.get('https://fitstats.mauexe.com/api/user/get', {headers});
+  }
+
   getCountries(): Observable<any> {
     const headers = new HttpHeaders().set('Content-Type', 'application/json');
 
