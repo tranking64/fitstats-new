@@ -9,8 +9,7 @@
 </ion-header>
 
 <ion-content>
-  <!-- add disabled if no friends-->
-  <ion-segment (ionChange)="segmentChanged($event)" value="all">
+  <ion-segment [(ngModel)]="segmentValue">
     <ion-segment-button value="all">
       <ion-label>Everyone</ion-label>
     </ion-segment-button>
@@ -18,4 +17,89 @@
       <ion-label>Friends only</ion-label>
     </ion-segment-button>
   </ion-segment>
+
+  <ion-grid>
+    <ion-row>
+      <ion-col>
+        <ion-card class="ion-no-margin">
+          <ion-card-content>
+            <div *ngIf="segmentValue === 'all'">
+              <ion-row *ngFor="let item of leaderboardAll; index as rank" class="rankings">
+                <ion-col *ngIf="rank+1 < 4" size="2">
+                  <b># {{ rank+1 }}</b>
+                </ion-col>
+                <ion-col *ngIf="rank+1 > 3" size="2">
+                  # {{ rank+1 }}
+                </ion-col>
+                <ion-col>
+                  <span>{{ item.user.username }}</span>
+                </ion-col>
+                <ion-col size="4" class="ion-text-end">
+                  <span>{{ item.counter }} units</span>
+                </ion-col>
+              </ion-row>
+            </div>
+
+            <div *ngIf="segmentValue === 'friends'">
+              <ion-row *ngFor="let item of leaderboardFriends; index as rank" class="rankings">
+                <ion-col *ngIf="rank+1 < 4" size="2">
+                  <b># {{ rank+1 }}</b>
+                </ion-col>
+                <ion-col *ngIf="rank+1 > 3" size="2">
+                  # {{ rank+1 }}
+                </ion-col>
+                <ion-col>
+                  <span>{{ item.user.username }}</span>
+                </ion-col>
+                <ion-col size="4" class="ion-text-end">
+                  <span>{{ item.counter }} units</span>
+                </ion-col>
+              </ion-row>
+            </div>
+          </ion-card-content>
+        </ion-card>
+      </ion-col>
+    </ion-row>
+  </ion-grid>
+
+  <!--<ion-grid>
+    <ion-row *ngFor="let item of friends; index as rank" class="rankings">
+      <ion-col size="2">
+        <b># {{ rank+1 }}</b>
+      </ion-col>
+      <ion-col>
+        <span>{{ item.username }}</span>
+      </ion-col>
+      <ion-col size="4" class="ion-text-end">
+        <span>{{ item.units }} units</span>
+      </ion-col>
+    </ion-row>
+  </ion-grid>-->
+
+  <!--<ion-grid>
+    <ion-row>
+      <ion-col>
+        <ion-card class="ion-no-margin ion-activatable ripple-parent" routerLink="/leaderboard">
+          <ion-ripple-effect></ion-ripple-effect>
+          <ion-card-header>
+            <ion-card-title>Leaderboard</ion-card-title>
+          </ion-card-header>
+
+          <ion-card-content>
+            <ion-row *ngFor="let item of friends; index as rank" class="rankings">
+              <ion-col size="2">
+                <b># {{ rank+1 }}</b>
+              </ion-col>
+              <ion-col>
+                <span>{{ item.username }}</span>
+              </ion-col>
+              <ion-col size="4" class="ion-text-end">
+                <span>{{ item.units }} units</span>
+              </ion-col>
+            </ion-row>
+          </ion-card-content>
+        </ion-card>
+      </ion-col>
+    </ion-row>
+  </ion-grid>-->
 </ion-content>

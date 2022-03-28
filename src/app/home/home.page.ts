@@ -1,11 +1,16 @@
 /* eslint-disable @typescript-eslint/naming-convention */
 import { AfterViewInit, Component, ElementRef, ViewChild } from '@angular/core';
 import { Chart, registerables } from 'chart.js';
-import { CrudService } from '../services/api/crud.service';
+import { TrainingService } from '../services/api/crud/training.service';
 import { Storage } from '@capacitor/storage';
 import { ModalController, NavController } from '@ionic/angular';
 import { format, parseISO } from 'date-fns';
 import { AuthService } from '../services/api/auth.service';
+import { ToastService } from '../services/helpers/toast.service';
+import { LoaderService } from '../services/helpers/loader.service';
+import { AlertService } from '../services/helpers/alert.service';
+import { LeaderboardService } from '../services/api/leaderboard.service';
+import { NavigationExtras, Router } from '@angular/router';
 
 @Component({
   selector: 'app-home',
@@ -23,6 +28,9 @@ export class HomePage implements AfterViewInit {
   genders = [];
   countries = [];
 
+  leaderboardAll = [];
+  leaderboardFriends = [];
+
   friends = [
     { username: 'AmOasch6', units: 16 },
     { username: 'very_bad', units: 12 },
@@ -35,8 +43,9 @@ export class HomePage implements AfterViewInit {
     email: '',
     gender: '',
     country: '',
+    gain_weight: false,
     // eslint-disable-next-line @typescript-eslint/naming-convention
-    date_of_birth: format(new Date(), 'yyyy-mm-dd')
+    date_of_birth: format(new Date(), 'yyyy-MM-dd')
   };
 
   pwData = {
@@ -45,14 +54,29 @@ export class HomePage implements AfterViewInit {
     c_new_password: ''
   };
 
+  tmpTraining =  {
+    exercise_type_id: null,
+    reps: '',
+    weight: '',
+    executed_at: format(new Date(), 'yyyy-MM-dd')
+  };
+
+  deletePassword = '';
+
   exerciseTypes = [];
   formattedDate = '';
+  formattedDateExecuted = format(parseISO(new Date().toISOString()), 'dd MMMM yyyy');;
 
   constructor(
-    private crudService: CrudService,
+    private trainingService: TrainingService,
     private navCtrl: NavController,
     private authService: AuthService,
-    private modalCtrl: ModalController
+    private modalCtrl: ModalController,
+    private toastService: ToastService,
+    private loaderService: LoaderService,
+    private alertService: AlertService,
+    private leaderboardService: LeaderboardService,
+    private router: Router
   ) {
     this.fetchExerciseTypes();
 
@@ -68,6 +92,26 @@ export class HomePage implements AfterViewInit {
   dateChanged(value) {
     this.userData.date_of_birth = value;
     this.formattedDate = format(parseISO(value), 'dd MMMM yyyy');
+  }
+
+  async addTraining() {
+    const accessToken = await (await Storage.get({ key: 'access_token' })).value;
+
+    this.trainingService.createTraining(this.tmpTraining, accessToken)
+      .subscribe(
+        res => {
+          console.log(res.data);
+          this.dismissModal();
+          this.toastService.presentToast('success', 'Successfully added training!');
+
+          //this.formattedDateExecuted = '';
+        }
+      );
+  }
+
+  dateChangedExecute(value) {
+    this.tmpTraining.executed_at = value;
+    this.formattedDateExecuted = format(parseISO(value), 'dd MMMM yyyy');
   }
 
   async fetchUserdata() {
@@ -108,15 +152,82 @@ export class HomePage implements AfterViewInit {
     }
   }
 
+  async updateUser() {
+    const accessToken = await (await Storage.get({ key: 'access_token' })).value;
+
+    this.loaderService.presentLoading();
+
+    this.authService.updateUser(this.userData, accessToken)
+      .subscribe(
+        res => {
+          this.loaderService.dismissLoading();
+          this.dismissModal();
+          this.toastService.presentToast('success', 'Credentials were successfully updated!');
+        },
+        err => {
+          this.loaderService.dismissLoading();
+          this.alertService.presentSimpleAlert('Error', err.error.message);
+        }
+      );
+  }
+
+  async changePassword() {
+    const accessToken = await (await Storage.get({ key: 'access_token' })).value;
+
+    this.loaderService.presentLoading();
+
+    this.authService.changePassword(this.pwData, accessToken)
+      .subscribe(
+        res => {
+          this.loaderService.dismissLoading();
+          this.dismissModal();
+          this.toastService.presentToast('success', 'Successfully changed password!');
+
+          this.pwData.old_password = '';
+          this.pwData.new_password = '';
+          this.pwData.c_new_password = '';
+        },
+        err => {
+          this.loaderService.dismissLoading();
+          this.alertService.presentSimpleAlert('Error', err.error.message);
+        }
+      );
+  }
+
+  async deleteAccount() {
+    const accessToken = await (await Storage.get({ key: 'access_token' })).value;
+
+    this.loaderService.presentLoading();
+
+    this.authService.deleteAccount(this.deletePassword, accessToken)
+      .subscribe(
+        async res => {
+          this.loaderService.dismissLoading();
+          this.deletePassword = '';
+
+          this.dismissModal();
+          setTimeout(() => { this.logout(); }, 250);
+          setTimeout(() => { this.toastService.presentToast('success', 'Your account was successfully deleted!'); }, 250);
+        },
+        err => {
+          this.loaderService.dismissLoading();
+          this.alertService.presentSimpleAlert('Error', err.error.message);
+        }
+      );
+  }
+
   async fetchExerciseTypes() {
     const accessToken = await (await Storage.get({ key: 'access_token' })).value;
 
-    this.crudService.getExerciseTypes(accessToken)
+    this.trainingService.getExerciseTypes(accessToken)
       .subscribe(res => this.exerciseTypes = res.data);
   }
 
   ionViewWillEnter() {
     this.fetchUserdata();
+
+    this.fetchLeaderboardAll();
+    this.fetchLeaderboardFriends();
 
     this.xLabel = [];
     this.yData = [];
@@ -142,6 +253,22 @@ export class HomePage implements AfterViewInit {
     this.lineChartMethod();
   }
 
+  async testing() {
+
+    const dates = [];
+    let currDate;
+
+    const accessToken = await (await Storage.get({ key: 'access_token' })).value;
+
+    for (let i = 13; i >= 0; i--) {
+      currDate = new Date();
+      currDate.setDate(currDate.getDate()-i);
+      dates.push(currDate.getDate());
+    }
+
+    this.alertService.presentSimpleAlert('Test', dates);
+  }
+
   dismissModal() {
     this.modalCtrl.dismiss();
   }
@@ -154,6 +281,7 @@ export class HomePage implements AfterViewInit {
         labels: this.xLabel, //['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'November', 'December'],
         datasets: [
           {
+            tension: 0.4,
             label: 'Used weight in kg',
             fill: false,
             backgroundColor: 'rgba(55,117,42,1)', // 'rgba(2,204,254,0.4)',
@@ -179,8 +307,43 @@ export class HomePage implements AfterViewInit {
     });
   }
 
-  sortAfterName(arr) {
+  async fetchLeaderboardAll() {
+    const accessToken = await (await Storage.get({ key: 'access_token' })).value;
+
+    this.leaderboardService.getLeaderboardAll(accessToken)
+      .subscribe(
+        res => {
+          this.leaderboardAll = res.data;
+        }
+      );
+  }
+
+  async fetchLeaderboardFriends() {
+    const accessToken = await (await Storage.get({ key: 'access_token' })).value;
+
+    this.leaderboardService.getLeaderboardFriends(accessToken)
+      .subscribe(
+        res => {
+          this.leaderboardFriends = res.data;
+        }
+      );
+  }
+
+  routeToLeaderboard() {
+    this.router.navigate(['leaderboard'], {
+      state: {
+        all: this.leaderboardAll,
+        friends: this.leaderboardFriends
+      }
+    });
+  }
+
+  sortAfterNameCountries(arr) {
     return arr.sort((a, b) => (a.country_type > b.country_type) ? 1 : -1);
+  }
+
+  sortAfterNameExercises(arr) {
+    return arr.sort((a, b) => (a.exercise_type > b.exercise_type) ? 1 : -1);
   }
 
   toTitleCase = (phrase) =>
@@ -195,7 +358,7 @@ export class HomePage implements AfterViewInit {
     let greeting = '';
 
     if (currentDate.getHours() < 5) {
-      greeting = 'Gute evening';
+      greeting = 'Good evening';
     }
     else if(currentDate.getHours() < 12) {
       greeting = 'Good morning';

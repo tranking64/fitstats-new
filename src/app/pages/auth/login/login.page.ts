@@ -33,7 +33,7 @@ export class LoginPage implements OnInit {
     gender: '',
     country: '',
     // eslint-disable-next-line @typescript-eslint/naming-convention
-    date_of_birth: format(new Date(), 'yyyy-mm-dd')
+    date_of_birth: format(new Date(), 'yyyy-MM-dd')
   };
 
   constructor(
@@ -42,7 +42,10 @@ export class LoginPage implements OnInit {
     private loaderService: LoaderService,
     private alertService: AlertService,
     private modalCtrl: ModalController
-  ) { }
+  ) {
+
+
+  }
 
   ngOnInit() {
     this.initColorTheme();
@@ -53,7 +56,7 @@ export class LoginPage implements OnInit {
     this.authService.getGenders()
       .subscribe(data => this.genders = data.data);
 
-    this.rememberMe();
+      this.rememberMe();
   }
 
   async initColorTheme() {
@@ -116,7 +119,10 @@ export class LoginPage implements OnInit {
         this.loaderService.dismissLoading();
         this.dismissModal();
       },
-      err => this.loaderService.dismissLoading()
+      err => {
+        this.loaderService.dismissLoading();
+        this.alertService.presentSimpleAlert('Error', err.error.message);
+      }
     );
   }
 
@@ -137,6 +143,7 @@ export class LoginPage implements OnInit {
       },
       err => {
         this.loaderService.dismissLoading();
+        this.alertService.presentSimpleAlert('Error', err.error.message);
       }
     );
   }

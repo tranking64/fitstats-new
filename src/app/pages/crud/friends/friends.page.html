@@ -5,9 +5,132 @@
     <ion-buttons slot="start">
       <ion-back-button></ion-back-button>
     </ion-buttons>
+    <ion-buttons slot="end">
+      <ion-button id="friend-modal">
+        <ion-icon name="person-add"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+
+    <ion-modal trigger="friend-modal" [breakpoints]="[0, 1]" [initialBreakpoint]="1">
+      <ng-template>
+        <ion-header>
+          <ion-toolbar>
+            <ion-title>Add new friend</ion-title>
+            <ion-buttons slot="end">
+              <ion-button (click)="dismissModal()">Close</ion-button>
+            </ion-buttons>
+          </ion-toolbar>
+        </ion-header>
+
+        <ion-content force-overscroll="false">
+          <ion-grid>
+            <ion-row>
+              <ion-col>
+                <ion-item>
+                  <ion-label position="stacked">Username</ion-label>
+                  <ion-input placeholder="Enter the username" [(ngModel)]="friendUsername"></ion-input>
+                </ion-item>
+              </ion-col>
+            </ion-row>
+            <ion-row>
+              <ion-col class="ion-text-center">
+                <ion-button style="width: 100%;" (click)="addFriend()">
+                  Add friend
+                </ion-button>
+              </ion-col>
+            </ion-row>
+          </ion-grid>
+        </ion-content>
+      </ng-template>
+    </ion-modal>
   </ion-toolbar>
 </ion-header>
 
 <ion-content>
+  <ion-grid>
+    <ion-row>
+      <ion-col>
+        <ion-card class="ion-no-margin">
+          <ion-card-header>
+            <ion-card-title>Friends <ion-badge color="primary">6</ion-badge></ion-card-title>
+          </ion-card-header>
 
+          <ion-card-content>
+            <div>
+              <ion-row class="listing">
+                <ion-col>dmnktrn</ion-col>
+                <ion-col class="ion-text-end">
+                  <ion-icon color="danger" name="trash-sharp"></ion-icon>
+                </ion-col>
+              </ion-row>
+
+              <ion-row class="listing">
+                <ion-col>fbn.trb</ion-col>
+                <ion-col class="ion-text-end">
+                  <ion-icon color="danger" name="trash-sharp"></ion-icon>
+                </ion-col>
+              </ion-row>
+
+              <ion-row class="listing">
+                <ion-col>cockie1337</ion-col>
+                <ion-col class="ion-text-end">
+                  <ion-icon color="danger" name="trash-sharp"></ion-icon>
+                </ion-col>
+              </ion-row>
+              <ion-row class="listing">
+                <ion-col>woosh</ion-col>
+                <ion-col class="ion-text-end">
+                  <ion-icon color="danger" name="trash-sharp"></ion-icon>
+                </ion-col>
+              </ion-row>
+
+              <ion-row class="listing">
+                <ion-col>very_gut</ion-col>
+                <ion-col class="ion-text-end">
+                  <ion-icon color="danger" name="trash-sharp"></ion-icon>
+                </ion-col>
+              </ion-row>
+
+              <ion-row class="listing">
+                <ion-col>very_bad</ion-col>
+                <ion-col class="ion-text-end">
+                  <ion-icon color="danger" name="trash-sharp"></ion-icon>
+                </ion-col>
+              </ion-row>
+            </div>
+          </ion-card-content>
+        </ion-card>
+      </ion-col>
+    </ion-row>
+
+    <ion-row>
+      <ion-col>
+        <ion-card class="ion-no-margin">
+          <ion-card-header>
+            <ion-card-title>Friend requests <ion-badge color="warning">2</ion-badge></ion-card-title>
+          </ion-card-header>
+
+          <ion-card-content>
+            <div>
+              <ion-row class="listing">
+                <ion-col>mauexe</ion-col>
+                <ion-col class="ion-text-end">
+                  <ion-icon color="success" name="checkmark-sharp"></ion-icon>
+                  <ion-icon color="danger" name="close-sharp"></ion-icon>
+                </ion-col>
+              </ion-row>
+
+              <ion-row class="listing">
+                <ion-col>sleipn1r</ion-col>
+                <ion-col class="ion-text-end">
+                  <ion-icon color="success" name="checkmark-sharp"></ion-icon>
+                  <ion-icon color="danger" name="close-sharp"></ion-icon>
+                </ion-col>
+              </ion-row>
+            </div>
+          </ion-card-content>
+        </ion-card>
+      </ion-col>
+    </ion-row>
+  </ion-grid>
 </ion-content>

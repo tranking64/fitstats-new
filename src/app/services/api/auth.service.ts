@@ -21,12 +21,40 @@ export class AuthService {
     return this.http.post('https://fitstats.mauexe.com/api/auth/login', userCredentials, {headers});
   }
 
+  updateUser(userCredentials, accessToken): Observable<any> {
+    const headers = new HttpHeaders()
+      .set('Content-Type', 'application/json')
+      .set('Authorization', accessToken);
+
+    return this.http.put('https://fitstats.mauexe.com/api/user/update', userCredentials, {headers});
+  }
+
+  changePassword(pwData, accessToken): Observable<any> {
+    const headers = new HttpHeaders()
+      .set('Content-Type', 'application/json')
+      .set('Authorization', accessToken);
+
+    return this.http.put('https://fitstats.mauexe.com/api/user/password',
+      // eslint-disable-next-line @typescript-eslint/naming-convention
+      {old_password: pwData.old_password, new_password: pwData.new_password}, {headers});
+  }
+
   refreshLogin(refreshToken): Observable<any> {
     const headers = new HttpHeaders()
       .set('Content-Type', 'application/json');
 
     // eslint-disable-next-line @typescript-eslint/naming-convention
     return this.http.post('https://fitstats.mauexe.com/api/auth/refresh', {refresh_token: refreshToken}, {headers});
+  }
+
+  deleteAccount(deletePassword, accessToken) {
+    const headers = new HttpHeaders()
+      .set('Content-Type', 'application/json')
+      .set('Authorization', accessToken);
+
+    const body = { password: deletePassword };
+
+    return this.http.request('delete', 'https://fitstats.mauexe.com/api/user/delete', {headers, body});
   }
 
   getUserdata(accessToken): Observable<any> {

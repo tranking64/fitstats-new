@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-leaderboard',
@@ -7,9 +8,17 @@ import { Component, OnInit } from '@angular/core';
 })
 export class LeaderboardPage implements OnInit {
 
-  constructor() { }
+  segmentValue = 'all';
+
+  leaderboardAll = [];
+  leaderboardFriends = [];
+
+  constructor(private router: Router) { }
 
   ngOnInit() {
+    const routerState = this.router.getCurrentNavigation().extras.state;
+    this.leaderboardAll = routerState.all;
+    this.leaderboardFriends = routerState.friends;
   }
 
 }

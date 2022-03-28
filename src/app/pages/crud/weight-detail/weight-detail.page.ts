@@ -9,6 +9,8 @@ import { Chart, registerables } from 'chart.js';
 export class WeightDetailPage implements AfterViewInit {
   @ViewChild('lineCanvas') private lineCanvas: ElementRef;
 
+  selectedSegment = 'week';
+
   lineChart: any;
 
   xLabel = [];
@@ -17,15 +19,35 @@ export class WeightDetailPage implements AfterViewInit {
   constructor(
 
   ) {
+    // eslint-disable-next-line max-len
+    this.xLabel = ['12. Mar', '13. Mar', '14. Mar', '15. Mar', '16. Mar', '17. Mar', '18. Mar', '19. Mar', '20. Mar', '21. Mar', '22. Mar', '23. Mar', '24. Mar', '25. Mar'];
     Chart.register(...registerables);
   }
 
   segmentChanged() {
-    this.xLabel = [];
-    this.yData = [];
+    if(this.selectedSegment === 'week') {
+      this.xLabel = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Nov', 'Dec'];
+      this.yData = [];
 
-    for (let i = 0; i < 14; i++) {
-      this.add();
+      for (let i = 0; i < 12; i++) {
+        this.yData.push(Math.floor(Math.random() * (70 - 60 + 1) + 60));
+
+      this.lineChart.destroy();
+      this.lineChartMethod();
+      }
+
+      this.selectedSegment = 'year';
+    }
+    else {
+      // eslint-disable-next-line max-len
+      this.xLabel = ['12. Mar', '13. Mar', '14. Mar', '15. Mar', '16. Mar', '17. Mar', '18. Mar', '19. Mar', '20. Mar', '21. Mar', '22. Mar', '23. Mar', '24. Mar', '25. Mar'];
+      this.yData = [];
+
+      for (let i = 0; i < 14; i++) {
+        this.add();
+      }
+
+      this.selectedSegment = 'week';
     }
   }
 
@@ -38,7 +60,6 @@ export class WeightDetailPage implements AfterViewInit {
   }
 
   add() {
-    this.xLabel.push('12. Jan');
     this.yData.push(Math.floor(Math.random() * (100 - 70 + 1) + 70));
 
     this.lineChart.destroy();
@@ -53,6 +74,7 @@ export class WeightDetailPage implements AfterViewInit {
         labels: this.xLabel, //['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'November', 'December'],
         datasets: [
           {
+            tension: 0.4,
             label: 'Bodyweight in kg',
             fill: false,
             backgroundColor: 'rgba(55,117,42,1)', // 'rgba(2,204,254,0.4)',

@@ -4,7 +4,7 @@
 
     <ion-buttons slot="start">
       <ion-button id="trigger-button">
-        <ion-icon size="large" color="dark" name="person"></ion-icon>
+        <ion-icon size="large" name="person"></ion-icon>
       </ion-button>
       <ion-modal trigger="trigger-button" [breakpoints]="[0, 0.5, 1]" [initialBreakpoint]="0.5">
         <ng-template>
@@ -78,7 +78,7 @@
                               <ion-item>
                                 <ion-label position="stacked">Country</ion-label>
                                 <ion-select placeholder="Select One" [(ngModel)]="userData.country">
-                                  <div *ngFor="let item of sortAfterName(countries)">
+                                  <div *ngFor="let item of sortAfterNameCountries(countries)">
                                     <ion-select-option value="{{ item.country_type }}">{{ toTitleCase(item.country_type) }}</ion-select-option>
                                   </div>
                                 </ion-select>
@@ -103,7 +103,7 @@
                           </ion-row>
                           <ion-row>
                             <ion-col class="ion-text-center">
-                              <ion-button style="width: 100%;">
+                              <ion-button (click)="updateUser()" style="width: 100%;">
                                 Save changes
                               </ion-button>
                             </ion-col>
@@ -162,7 +162,7 @@
                           </ion-row>
                           <ion-row>
                             <ion-col class="ion-text-center">
-                              <ion-button style="width: 100%;">
+                              <ion-button (click)="changePassword()" style="width: 100%;">
                                 Save changes
                               </ion-button>
                             </ion-col>
@@ -176,12 +176,48 @@
               </ion-row>
               <ion-row>
                 <ion-col>
-                  <ion-card class="ion-no-margin ion-activatable ripple-parent" style="height: 100%;">
+                  <ion-card id="delete-account" class="ion-no-margin ion-activatable ripple-parent" style="height: 100%;">
                     <ion-ripple-effect></ion-ripple-effect>
                     <ion-card-header>
                       <ion-card-title><h5 class="ion-no-margin">Delete account</h5></ion-card-title>
                     </ion-card-header>
                   </ion-card>
+
+                  <ion-modal trigger="delete-account" [breakpoints]="[0, 1]" [initialBreakpoint]="1">
+                    <ng-template>
+                      <ion-header>
+                        <ion-toolbar>
+                          <ion-title>Delete account</ion-title>
+                          <ion-buttons slot="end">
+                            <ion-button (click)="dismissModal()">Close</ion-button>
+                          </ion-buttons>
+                        </ion-toolbar>
+                      </ion-header>
+
+                      <ion-content>
+                        <div style="background-color: whitesmoke; border-radius: 0 0 20px 20px; box-shadow: 0px 2px 10px rgba(0, 0, 0, 0.25);">
+                          <img style="border-radius: 0 0 20px 20px; margin-top: 15px;" src="../../../../assets/throw_away.svg">
+                        </div>
+                        <ion-grid>
+                          <ion-row>
+                            <ion-col>
+                              <ion-item>
+                                <ion-label position="stacked">Password</ion-label>
+                                <ion-input type="password" placeholder="Enter your password" [(ngModel)]="deletePassword"></ion-input>
+                              </ion-item>
+                            </ion-col>
+                          </ion-row>
+                          <ion-row>
+                            <ion-col class="ion-text-center">
+                              <ion-button color="danger" (click)="deleteAccount()" style="width: 100%;">
+                                Delete
+                              </ion-button>
+                            </ion-col>
+                          </ion-row>
+                        </ion-grid>
+                      </ion-content>
+                    </ng-template>
+                  </ion-modal>
                 </ion-col>
               </ion-row>
               <ion-row>
@@ -220,10 +256,10 @@
           <ion-ripple-effect></ion-ripple-effect>
 
           <ion-card-subtitle>
-            <ion-item>
-              <ion-label>Exercise type</ion-label>
+            <ion-item class="ion-no-padding">
+              <ion-label class="ion-margin-start">Exercise type</ion-label>
               <ion-select placeholder="None">
-                <div *ngFor="let item of sortAfterName(exerciseTypes)">
+                <div *ngFor="let item of sortAfterNameExercises(exerciseTypes)">
                   <ion-select-option value="{{ item.exercise_type_id }}">{{ item.exercise_type }}</ion-select-option>
                 </div>
               </ion-select>
@@ -247,7 +283,7 @@
           </ion-card-header>
 
           <ion-card-content class="ion-text-center">
-            <ion-badge style="width: 90%;" color="warning">1 new friend request</ion-badge>
+            <ion-badge style="width: 90%;" color="warning">2 new friend request</ion-badge>
           </ion-card-content>
         </ion-card>
       </ion-col>
@@ -261,7 +297,7 @@
           </ion-card-header>
 
           <ion-card-content>
-            <ion-text color="danger" class="ion-text-center">
+            <ion-text color="primary" class="ion-text-center">
               <h1><ion-icon name="arrow-up"></ion-icon> 1.5kg</h1>
             </ion-text>
           </ion-card-content>
@@ -271,22 +307,22 @@
 
     <ion-row>
       <ion-col>
-        <ion-card class="ion-no-margin ion-activatable ripple-parent" routerLink="/leaderboard">
+        <ion-card (click)="routeToLeaderboard()" class="ion-no-margin ion-activatable ripple-parent">
           <ion-ripple-effect></ion-ripple-effect>
           <ion-card-header>
             <ion-card-title>Leaderboard</ion-card-title>
           </ion-card-header>
 
           <ion-card-content>
-            <ion-row *ngFor="let item of friends.slice(0, 3); index as rank" class="rankings">
+            <ion-row *ngFor="let item of leaderboardAll.slice(0, 3); index as rank" class="rankings">
               <ion-col size="2">
-                <b># {{ rank+1 }}</b>
+                # {{ rank+1 }}
               </ion-col>
               <ion-col>
-                <span>{{ item.username }}</span>
+                <span>{{ item.user.username }}</span>
               </ion-col>
               <ion-col size="4" class="ion-text-end">
-                <span>{{ item.units }} units</span>
+                <span>{{ item.counter }} units</span>
               </ion-col>
             </ion-row>
           </ion-card-content>
@@ -300,13 +336,88 @@
       <ion-icon name="add"></ion-icon>
     </ion-fab-button>
     <ion-fab-list side="top">
-      <ion-fab-button color="secondary" (click)="add()">
+
+      <ion-fab-button color="secondary" id="training-modal">
         <ion-icon name="barbell"></ion-icon>
       </ion-fab-button>
+
+      <ion-modal trigger="training-modal" [breakpoints]="[0, 1]" [initialBreakpoint]="1">
+        <ng-template>
+          <ion-header>
+            <ion-toolbar>
+              <ion-title>Add training</ion-title>
+              <ion-buttons slot="end">
+                <ion-button (click)="dismissModal()">Close</ion-button>
+              </ion-buttons>
+            </ion-toolbar>
+          </ion-header>
+
+          <ion-content>
+            <ion-grid>
+              <ion-row>
+                <ion-col>
+                  <ion-item>
+                    <ion-label position="stacked">Exercise type</ion-label>
+                    <ion-select placeholder="None" [(ngModel)]="tmpTraining.exercise_type_id">
+                      <div *ngFor="let item of sortAfterNameExercises(exerciseTypes)">
+                        <ion-select-option value="{{ item.exercise_type_id }}">{{ item.exercise_type }}</ion-select-option>
+                      </div>
+                    </ion-select>
+                  </ion-item>
+                </ion-col>
+              </ion-row>
+              <ion-row>
+                <ion-col>
+                  <ion-item>
+                    <ion-label position="stacked">Amount of reps</ion-label>
+                    <ion-input inputmode="decimal" placeholder="Enter your repetitions" [(ngModel)]="tmpTraining.reps"></ion-input>
+                  </ion-item>
+                </ion-col>
+              </ion-row>
+              <ion-row>
+                <ion-col>
+                  <ion-item>
+                    <ion-label position="stacked">Used weight</ion-label>
+                    <ion-input inputmode="decimal" placeholder="Enter your training weight" [(ngModel)]="tmpTraining.weight"></ion-input>
+                  </ion-item>
+                </ion-col>
+              </ion-row>
+              <ion-row>
+                <ion-col>
+                  <ion-item>
+                    <ion-label position="stacked">Executed at</ion-label>
+                    <ion-input placeholder="Enter date of execution" id="executed-at-modal" [(ngModel)]="formattedDateExecuted"></ion-input>
+                  </ion-item>
+
+                  <ion-modal class="bday-modal" trigger="executed-at-modal">
+                    <ng-template>
+                      <ion-content force-overscroll="false">
+                        <ion-datetime locale="en-EN" #datetime presentation="date" [value]="tmpTraining.executed_at" (ionChange)="dateChangedExecute(datetime.value)" showDefaultButtons="true"></ion-datetime>
+                      </ion-content>
+                    </ng-template>
+                  </ion-modal>
+                </ion-col>
+              </ion-row>
+              <ion-row>
+                <ion-col class="ion-text-center">
+                  <ion-button color="primary" (click)="addTraining()" style="width: 100%;">
+                    Create
+                  </ion-button>
+                </ion-col>
+              </ion-row>
+            </ion-grid>
+          </ion-content>
+        </ng-template>
+      </ion-modal>
+
       <ion-fab-button color="secondary">
         <ion-icon name="scale"></ion-icon>
       </ion-fab-button>
     </ion-fab-list>
   </ion-fab>
+
+  <ion-button (click)="testing()" color="success">
+    Testing
+  </ion-button>
 
 </ion-content>

@@ -1,4 +1,4 @@
-import { AfterViewInit, Component, ElementRef, OnInit, ViewChild } from '@angular/core';
+import { AfterViewInit, Component, ElementRef, ViewChild } from '@angular/core';
 import { Chart, registerables } from 'chart.js';
 
 @Component({
@@ -44,6 +44,7 @@ export class ExerciseDetailPage implements AfterViewInit {
         labels: this.xLabel, //['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'November', 'December'],
         datasets: [
           {
+            tension: 0.4,
             label: 'Used weight in kg',
             fill: false,
             backgroundColor: 'rgba(55,117,42,1)', // 'rgba(2,204,254,0.4)',
