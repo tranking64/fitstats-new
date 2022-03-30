@@ -1,5 +1,6 @@
 import { AfterViewInit, Component, ElementRef, OnInit, ViewChild } from '@angular/core';
 import { Chart, registerables } from 'chart.js';
+import { format } from 'date-fns';
 
 @Component({
   selector: 'app-weight-detail',
@@ -26,10 +27,18 @@ export class WeightDetailPage implements AfterViewInit {
 
   segmentChanged() {
     if(this.selectedSegment === 'week') {
-      this.xLabel = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Nov', 'Dec'];
+      this.xLabel=[];
+      let currDate;
+
+      for (let i = 11; i > 0; i--) {
+        currDate = new Date();
+        currDate.setMonth(currDate.getMonth()-i);
+        this.xLabel.push(format(currDate, 'MMM'));
+      }
+      //this.xLabel = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Nov', 'Dec'];
       this.yData = [];
 
-      for (let i = 0; i < 12; i++) {
+      for (let i = 0; i < 11; i++) {
         this.yData.push(Math.floor(Math.random() * (70 - 60 + 1) + 60));
 
       this.lineChart.destroy();
@@ -93,7 +102,7 @@ export class WeightDetailPage implements AfterViewInit {
             pointRadius: 1,
             pointHitRadius: 10,
             data: this.yData, //[47.5, 35, 52.5, 50, 47.5, 45, 40, 40, 50, 50, 45, 40],
-            spanGaps: false,
+            spanGaps: true,
           }
         ]
       }

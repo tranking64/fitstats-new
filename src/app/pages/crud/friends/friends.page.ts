@@ -5,6 +5,7 @@ import { ToastService } from 'src/app/services/helpers/toast.service';
 import { Storage } from '@capacitor/storage';
 import { LoaderService } from 'src/app/services/helpers/loader.service';
 import { AlertService } from 'src/app/services/helpers/alert.service';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-friends',
@@ -15,15 +16,20 @@ export class FriendsPage implements OnInit {
 
   friendUsername = '';
 
+  friendRequests = [];
+
   constructor(
     private modalCtrl: ModalController,
     private toastService: ToastService,
     private loaderSerivce: LoaderService,
     private friendService: FriendService,
-    private alertService: AlertService
+    private alertService: AlertService,
+    private router: Router
   ) { }
 
   ngOnInit() {
+    const routerState = this.router.getCurrentNavigation().extras.state;
+    this.friendRequests = routerState.requests;
   }
 
   dismissModal() {

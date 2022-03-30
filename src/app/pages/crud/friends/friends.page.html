@@ -103,25 +103,17 @@
       </ion-col>
     </ion-row>
 
-    <ion-row>
+    <ion-row *ngIf="friendRequests.length !== 0">
       <ion-col>
         <ion-card class="ion-no-margin">
           <ion-card-header>
-            <ion-card-title>Friend requests <ion-badge color="warning">2</ion-badge></ion-card-title>
+            <ion-card-title>Friend requests <ion-badge color="warning">{{ friendRequests.length }}</ion-badge></ion-card-title>
           </ion-card-header>
 
           <ion-card-content>
-            <div>
+            <div *ngFor="let item of friendRequests">
               <ion-row class="listing">
-                <ion-col>mauexe</ion-col>
-                <ion-col class="ion-text-end">
-                  <ion-icon color="success" name="checkmark-sharp"></ion-icon>
-                  <ion-icon color="danger" name="close-sharp"></ion-icon>
-                </ion-col>
-              </ion-row>
-
-              <ion-row class="listing">
-                <ion-col>sleipn1r</ion-col>
+                <ion-col>{{ item.username }}</ion-col>
                 <ion-col class="ion-text-end">
                   <ion-icon color="success" name="checkmark-sharp"></ion-icon>
                   <ion-icon color="danger" name="close-sharp"></ion-icon>

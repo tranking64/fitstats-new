@@ -17,4 +17,12 @@ export class FriendService {
       // eslint-disable-next-line @typescript-eslint/naming-convention
       return this.http.post('https://fitstats.mauexe.com/api/friend/add', {friend_username: username}, {headers});
   }
+
+  getFriendRequests(accessToken): Observable<any> {
+    const headers = new HttpHeaders()
+      .set('Content-Type', 'application/json')
+      .set('Authorization', accessToken);
+
+    return this.http.get('https://fitstats.mauexe.com/api/friend/get/invites', {headers});
+  }
 }

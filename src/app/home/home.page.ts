@@ -10,7 +10,9 @@ import { ToastService } from '../services/helpers/toast.service';
 import { LoaderService } from '../services/helpers/loader.service';
 import { AlertService } from '../services/helpers/alert.service';
 import { LeaderboardService } from '../services/api/leaderboard.service';
-import { NavigationExtras, Router } from '@angular/router';
+import { Router } from '@angular/router';
+import { FriendService } from '../services/api/crud/friend.service';
+import { WeightService } from '../services/api/crud/weight.service';
 
 @Component({
   selector: 'app-home',
@@ -31,12 +33,10 @@ export class HomePage implements AfterViewInit {
   leaderboardAll = [];
   leaderboardFriends = [];
 
-  friends = [
-    { username: 'AmOasch6', units: 16 },
-    { username: 'very_bad', units: 12 },
-    { username: 'hoggst rider', units: 7 },
-    { username: 'aleggs', units: 5 }
-  ];
+  friendList = [];
+  friendRequests = [];
+
+  selectedExercise = 1 + '';
 
   userData = {
     username: '',
@@ -61,11 +61,18 @@ export class HomePage implements AfterViewInit {
     executed_at: format(new Date(), 'yyyy-MM-dd')
   };
 
+  tmpWeight =  {
+    weight: '',
+    weighted_at: format(new Date(), 'yyyy-MM-dd')
+  };
+
   deletePassword = '';
 
   exerciseTypes = [];
+
   formattedDate = '';
-  formattedDateExecuted = format(parseISO(new Date().toISOString()), 'dd MMMM yyyy');;
+  formattedDateExecuted = format(parseISO(new Date().toISOString()), 'dd MMMM yyyy');
+  formattedDateWeighted = format(parseISO(new Date().toISOString()), 'dd MMMM yyyy');
 
   constructor(
     private trainingService: TrainingService,
@@ -76,7 +83,9 @@ export class HomePage implements AfterViewInit {
     private loaderService: LoaderService,
     private alertService: AlertService,
     private leaderboardService: LeaderboardService,
-    private router: Router
+    private router: Router,
+    private friendService: FriendService,
+    private weightService: WeightService
   ) {
     this.fetchExerciseTypes();
 
@@ -94,6 +103,11 @@ export class HomePage implements AfterViewInit {
     this.formattedDate = format(parseISO(value), 'dd MMMM yyyy');
   }
 
+  dateChangedWeighted(value) {
+    this.tmpWeight.weighted_at = value;
+    this.formattedDateWeighted = format(parseISO(value), 'dd MMMM yyyy');
+  }
+
   async addTraining() {
     const accessToken = await (await Storage.get({ key: 'access_token' })).value;
 
@@ -103,6 +117,22 @@ export class HomePage implements AfterViewInit {
           console.log(res.data);
           this.dismissModal();
           this.toastService.presentToast('success', 'Successfully added training!');
+
+          //this.formattedDateExecuted = '';
+        }
+      );
+  }
+
+  async addWeight() {
+
+    console.log(this.tmpWeight);
+    const accessToken = await (await Storage.get({ key: 'access_token' })).value;
+
+    this.weightService.createWeight(this.tmpWeight, accessToken)
+      .subscribe(
+        res => {
+          this.dismissModal();
+          this.toastService.presentToast('success', 'Successfully added weight entry!');
 
           //this.formattedDateExecuted = '';
         }
@@ -229,24 +259,37 @@ export class HomePage implements AfterViewInit {
     this.fetchLeaderboardAll();
     this.fetchLeaderboardFriends();
 
-    this.xLabel = [];
-    this.yData = [];
+    this.fetchFriendRequests();
+
+    //this.xLabel = [];
+    //this.yData = [];
 
     for (let i = 0; i < 14; i++) {
-      this.add();
+      //this.add();
     }
   }
 
   ngAfterViewInit() {
+    //this.yData = [5,null,15,40];
+    //this.xLabel = ['1', '2', '3', '4'];
     this.lineChartMethod();
 
     for (let i = 0; i < 14; i++) {
       this.add();
     }
+
+    let currDate;
+
+    for (let i = 13; i >= 0; i--) {
+      currDate = new Date();
+      currDate.setDate(currDate.getDate()-i);
+      this.xLabel.push(format(currDate, 'dd MMM'));
+    }
+
   }
 
   add() {
-    this.xLabel.push('12. Jan');
+    //this.xLabel.push('12. Jan');
     this.yData.push(Math.floor(Math.random() * (100 - 70 + 1) + 70));
 
     this.lineChart.destroy();
@@ -256,14 +299,14 @@ export class HomePage implements AfterViewInit {
   async testing() {
 
     const dates = [];
-    let currDate;
+    let currDate = new Date();
 
     const accessToken = await (await Storage.get({ key: 'access_token' })).value;
 
     for (let i = 13; i >= 0; i--) {
       currDate = new Date();
       currDate.setDate(currDate.getDate()-i);
-      dates.push(currDate.getDate());
+      dates.push(format(currDate, 'dd MMM'));
     }
 
     this.alertService.presentSimpleAlert('Test', dates);
@@ -300,11 +343,22 @@ export class HomePage implements AfterViewInit {
             pointRadius: 1,
             pointHitRadius: 10,
             data: this.yData, //[47.5, 35, 52.5, 50, 47.5, 45, 40, 40, 50, 50, 45, 40],
-            spanGaps: false,
+            spanGaps: true,
           }
         ]
       }
     });
+  }
+
+  async fetchFriendRequests() {
+    const accessToken = await (await Storage.get({ key: 'access_token' })).value;
+
+    this.friendService.getFriendRequests(accessToken)
+      .subscribe(
+        res => {
+          this.friendRequests = res.data;
+        }
+      );
   }
 
   async fetchLeaderboardAll() {
@@ -327,6 +381,14 @@ export class HomePage implements AfterViewInit {
           this.leaderboardFriends = res.data;
         }
       );
+  }
+
+  routeToFriends() {
+    this.router.navigate(['friends'], {
+      state: {
+        requests: this.friendRequests
+      }
+    });
   }
 
   routeToLeaderboard() {

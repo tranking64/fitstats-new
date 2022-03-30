@@ -63,7 +63,7 @@ export class ExerciseDetailPage implements AfterViewInit {
             pointRadius: 1,
             pointHitRadius: 10,
             data: this.yData, //[47.5, 35, 52.5, 50, 47.5, 45, 40, 40, 50, 50, 45, 40],
-            spanGaps: false,
+            spanGaps: true,
           }
         ]
       }
