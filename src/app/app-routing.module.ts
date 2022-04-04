@@ -31,6 +31,10 @@ const routes: Routes = [
     path: 'friends',
     loadChildren: () => import('./pages/crud/friends/friends.module').then( m => m.FriendsPageModule)
   },
+  {
+    path: 'edit-exercise',
+    loadChildren: () => import('./pages/crud/edit-exercise/edit-exercise.module').then( m => m.EditExercisePageModule)
+  },
 ];
 
 @NgModule({

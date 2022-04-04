@@ -52,51 +52,26 @@
       <ion-col>
         <ion-card class="ion-no-margin">
           <ion-card-header>
-            <ion-card-title>Friends <ion-badge color="primary">6</ion-badge></ion-card-title>
+            <ion-card-title>Friends <ion-badge color="primary">{{ friendList.length }}</ion-badge></ion-card-title>
           </ion-card-header>
 
           <ion-card-content>
-            <div>
-              <ion-row class="listing">
-                <ion-col>dmnktrn</ion-col>
-                <ion-col class="ion-text-end">
-                  <ion-icon color="danger" name="trash-sharp"></ion-icon>
+            <div *ngIf="friendList.length === 0">
+              <ion-row>
+                <ion-col class="ion-text-center">
+                  <ion-text>You currently have no friends. Add one!</ion-text>
                 </ion-col>
               </ion-row>
-
-              <ion-row class="listing">
-                <ion-col>fbn.trb</ion-col>
-                <ion-col class="ion-text-end">
-                  <ion-icon color="danger" name="trash-sharp"></ion-icon>
-                </ion-col>
-              </ion-row>
-
-              <ion-row class="listing">
-                <ion-col>cockie1337</ion-col>
-                <ion-col class="ion-text-end">
-                  <ion-icon color="danger" name="trash-sharp"></ion-icon>
-                </ion-col>
-              </ion-row>
-              <ion-row class="listing">
-                <ion-col>woosh</ion-col>
-                <ion-col class="ion-text-end">
-                  <ion-icon color="danger" name="trash-sharp"></ion-icon>
-                </ion-col>
-              </ion-row>
-
-              <ion-row class="listing">
-                <ion-col>very_gut</ion-col>
-                <ion-col class="ion-text-end">
-                  <ion-icon color="danger" name="trash-sharp"></ion-icon>
-                </ion-col>
-              </ion-row>
-
-              <ion-row class="listing">
-                <ion-col>very_bad</ion-col>
-                <ion-col class="ion-text-end">
-                  <ion-icon color="danger" name="trash-sharp"></ion-icon>
-                </ion-col>
-              </ion-row>
+            </div>
+            <div *ngIf="friendList.length > 0">
+              <div *ngFor="let item of friendList">
+                <ion-row class="listing">
+                  <ion-col>{{ item.username }}</ion-col>
+                  <ion-col class="ion-text-end">
+                    <ion-icon (click)="remove(item)" color="danger" name="trash-sharp"></ion-icon>
+                  </ion-col>
+                </ion-row>
+              </div>
             </div>
           </ion-card-content>
         </ion-card>
@@ -115,8 +90,8 @@
               <ion-row class="listing">
                 <ion-col>{{ item.username }}</ion-col>
                 <ion-col class="ion-text-end">
-                  <ion-icon color="success" name="checkmark-sharp"></ion-icon>
-                  <ion-icon color="danger" name="close-sharp"></ion-icon>
+                  <ion-icon (click)="accept(item)" color="success" name="checkmark-sharp"></ion-icon>
+                  <ion-icon (click)="decline(item)" color="danger" name="close-sharp"></ion-icon>
                 </ion-col>
               </ion-row>
             </div>

@@ -47,6 +47,22 @@ export class AuthService {
     return this.http.post('https://fitstats.mauexe.com/api/auth/refresh', {refresh_token: refreshToken}, {headers});
   }
 
+  forgotPassword(mail): Observable<any> {
+    const headers = new HttpHeaders()
+      .set('Content-Type', 'application/json');
+
+    // eslint-disable-next-line @typescript-eslint/naming-convention
+    return this.http.post('https://fitstats.mauexe.com/api/auth/forgot', {email: mail}, {headers});
+  }
+
+  resetPassword(rToken, rPassword): Observable<any> {
+    const headers = new HttpHeaders()
+      .set('Content-Type', 'application/json');
+
+    // eslint-disable-next-line @typescript-eslint/naming-convention
+    return this.http.post('https://fitstats.mauexe.com/api/auth/reset', {token: rToken, password: rPassword}, {headers});
+  }
+
   deleteAccount(deletePassword, accessToken) {
     const headers = new HttpHeaders()
       .set('Content-Type', 'application/json')

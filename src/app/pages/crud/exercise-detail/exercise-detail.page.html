@@ -1,6 +1,6 @@
 <ion-header>
   <ion-toolbar>
-    <ion-title>Bench press</ion-title>
+    <ion-title>{{ exerciseName }}</ion-title>
 
     <ion-buttons slot="start">
       <ion-back-button></ion-back-button>
@@ -9,6 +9,15 @@
 </ion-header>
 
 <ion-content>
+  <ion-segment (ionChange)="segmentChanged()" [value]="selectedSegment">
+    <ion-segment-button value="week">
+      <ion-label>Last 14 days</ion-label>
+    </ion-segment-button>
+    <ion-segment-button value="year">
+      <ion-label>Last 12 months</ion-label>
+    </ion-segment-button>
+  </ion-segment>
+
   <ion-grid>
 
     <ion-row>
@@ -24,111 +33,32 @@
         </ion-card>
       </ion-col>
     </ion-row>
+    <!--  *ngIf="selectedSegment === 'week'" -->
     <ion-row>
       <ion-col>
         <ion-card class="ion-no-margin">
           <ion-card-header>
-            <ion-card-title>Sets of last 14 days</ion-card-title>
+            <ion-card-title>Entries of last 14 days</ion-card-title>
           </ion-card-header>
 
           <ion-card-content>
-            <div>
-              <ion-row class="listing">
-                <ion-col>Date</ion-col>
-                <ion-col>Reps</ion-col>
-                <ion-col>Weight</ion-col>
-                <ion-col class="ion-text-end">Actions</ion-col>
-              </ion-row>
-
-              <ion-row class="listing">
-                <ion-col>22 March</ion-col>
-                <ion-col>10x</ion-col>
-                <ion-col>40kg</ion-col>
-                <ion-col class="ion-text-end">
-                  <ion-icon name="pencil"></ion-icon>
-                  <ion-icon color="danger" name="trash"></ion-icon>
-                </ion-col>
-              </ion-row>
-
-              <ion-row class="listing">
-                <ion-col>22 March</ion-col>
-                <ion-col>8x</ion-col>
-                <ion-col>42.5kg</ion-col>
-                <ion-col class="ion-text-end">
-                  <ion-icon name="pencil"></ion-icon>
-                  <ion-icon color="danger" name="trash"></ion-icon>
-                </ion-col>
-              </ion-row>
-
-              <ion-row class="listing">
-                <ion-col>18 March</ion-col>
-                <ion-col>8x</ion-col>
-                <ion-col>45kg</ion-col>
-                <ion-col class="ion-text-end">
-                  <ion-icon name="pencil"></ion-icon>
-                  <ion-icon color="danger" name="trash"></ion-icon>
-                </ion-col>
-              </ion-row>
-
-              <ion-row class="listing">
-                <ion-col>22 March</ion-col>
-                <ion-col>10x</ion-col>
-                <ion-col>40kg</ion-col>
-                <ion-col class="ion-text-end">
-                  <ion-icon name="pencil"></ion-icon>
-                  <ion-icon color="danger" name="trash"></ion-icon>
-                </ion-col>
-              </ion-row>
-
-              <ion-row class="listing">
-                <ion-col>22 March</ion-col>
-                <ion-col>8x</ion-col>
-                <ion-col>42.5kg</ion-col>
-                <ion-col class="ion-text-end">
-                  <ion-icon name="pencil"></ion-icon>
-                  <ion-icon color="danger" name="trash"></ion-icon>
-                </ion-col>
-              </ion-row>
-
-              <ion-row class="listing">
-                <ion-col>18 March</ion-col>
-                <ion-col>8x</ion-col>
-                <ion-col>45kg</ion-col>
-                <ion-col class="ion-text-end">
-                  <ion-icon name="pencil"></ion-icon>
-                  <ion-icon color="danger" name="trash"></ion-icon>
-                </ion-col>
-              </ion-row>
-
             <ion-row class="listing">
-              <ion-col>22 March</ion-col>
-              <ion-col>10x</ion-col>
-              <ion-col>40kg</ion-col>
-              <ion-col class="ion-text-end">
-                <ion-icon name="pencil"></ion-icon>
-                <ion-icon color="danger" name="trash"></ion-icon>
-              </ion-col>
+              <ion-col>Date</ion-col>
+              <ion-col>Reps</ion-col>
+              <ion-col>Weight</ion-col>
+              <ion-col class="ion-text-end">Actions</ion-col>
             </ion-row>
 
-            <ion-row class="listing">
-              <ion-col>22 March</ion-col>
-              <ion-col>8x</ion-col>
-              <ion-col>42.5kg</ion-col>
-              <ion-col class="ion-text-end">
-                <ion-icon name="pencil"></ion-icon>
-                <ion-icon color="danger" name="trash"></ion-icon>
-              </ion-col>
-            </ion-row>
-
-            <ion-row class="listing">
-              <ion-col>18 March</ion-col>
-              <ion-col>8x</ion-col>
-              <ion-col>45kg</ion-col>
-              <ion-col class="ion-text-end">
-                <ion-icon name="pencil"></ion-icon>
-                <ion-icon color="danger" name="trash"></ion-icon>
-              </ion-col>
-            </ion-row>
+            <div *ngFor="let item of trainingData.entries">
+              <ion-row class="listing">
+                <ion-col>{{ formatDate(item.executed_at) }}</ion-col>
+                <ion-col>{{ item.reps }}x</ion-col>
+                <ion-col>{{ item.weight }}kg</ion-col>
+                <ion-col class="ion-text-end">
+                  <ion-icon (click)="presentEditModal(item)" name="pencil"></ion-icon>
+                  <ion-icon (click)="deleteEntry(item)" color="danger" name="trash"></ion-icon>
+                </ion-col>
+              </ion-row>
             </div>
           </ion-card-content>
         </ion-card>
@@ -142,3 +72,5 @@
     </ion-fab-button>
   </ion-fab>
 </ion-content>
+
+

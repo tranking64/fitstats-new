@@ -1,3 +1,4 @@
+import { CurrencyPipe } from '@angular/common';
 import { AfterViewInit, Component, ElementRef, OnInit, ViewChild } from '@angular/core';
 import { Chart, registerables } from 'chart.js';
 import { format } from 'date-fns';

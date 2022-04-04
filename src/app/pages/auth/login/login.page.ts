@@ -5,6 +5,7 @@ import { Storage } from '@capacitor/storage';
 import { LoaderService } from 'src/app/services/helpers/loader.service';
 import { AlertService } from 'src/app/services/helpers/alert.service';
 import { format, parseISO } from 'date-fns';
+import { ToastService } from 'src/app/services/helpers/toast.service';
 
 @Component({
   selector: 'app-login',
@@ -12,6 +13,8 @@ import { format, parseISO } from 'date-fns';
   styleUrls: ['./login.page.scss'],
 })
 export class LoginPage implements OnInit {
+
+  nextStep = false;
 
   formattedDate = '';
 
@@ -23,6 +26,13 @@ export class LoginPage implements OnInit {
   userCredentials = {
     email: '',
     password: ''
+  };
+
+  resetCredentials = {
+    email: '',
+    code: '',
+    password: '',
+    cPassword: ''
   };
 
   tmpUser = {
@@ -41,7 +51,8 @@ export class LoginPage implements OnInit {
     private navCtrl: NavController,
     private loaderService: LoaderService,
     private alertService: AlertService,
-    private modalCtrl: ModalController
+    private modalCtrl: ModalController,
+    private toastService: ToastService
   ) {
 
 
@@ -104,6 +115,7 @@ export class LoginPage implements OnInit {
 
   dismissModal() {
     this.modalCtrl.dismiss();
+    this.nextStep = false;
   }
 
   dateChanged(value) {
@@ -146,6 +158,23 @@ export class LoginPage implements OnInit {
         this.alertService.presentSimpleAlert('Error', err.error.message);
       }
     );
+  }
+
+  sendLink() {
+    this.authService.forgotPassword(this.resetCredentials.email)
+      .subscribe(
+        () => this.nextStep = true
+      );
+  }
+
+  resetPassword() {
+    this.authService.resetPassword(this.resetCredentials.code, this.resetCredentials.password)
+      .subscribe(
+        () => {
+          this.dismissModal();
+          this.toastService.presentToast('success', 'Your password has been successfully changed!');
+        }
+      );
   }
 
   sortAfterName(arr) {

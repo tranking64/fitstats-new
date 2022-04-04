@@ -20,12 +20,18 @@ import { WeightService } from '../services/api/crud/weight.service';
   styleUrls: ['home.page.scss'],
 })
 export class HomePage implements AfterViewInit {
+
+  // chart-specific
   @ViewChild('lineCanvas') private lineCanvas: ElementRef;
-
   lineChart: any;
-
   xLabel = [];
-  yData = [];
+  yData = new Array(14).fill(null);
+
+  // for progress bar
+  pageIsLoading = false;
+
+  // data
+  //presentWeekData = new Array(14).fill(null);
 
   genders = [];
   countries = [];
@@ -36,9 +42,10 @@ export class HomePage implements AfterViewInit {
   friendList = [];
   friendRequests = [];
 
-  selectedExercise = 1 + '';
+  selectedExerciseId = 0;
 
   userData = {
+    user_id: null,
     username: '',
     email: '',
     gender: '',
@@ -47,6 +54,8 @@ export class HomePage implements AfterViewInit {
     // eslint-disable-next-line @typescript-eslint/naming-convention
     date_of_birth: format(new Date(), 'yyyy-MM-dd')
   };
+
+  dates = [];
 
   pwData = {
     old_password: '',
@@ -64,6 +73,12 @@ export class HomePage implements AfterViewInit {
   tmpWeight =  {
     weight: '',
     weighted_at: format(new Date(), 'yyyy-MM-dd')
+  };
+
+  trainingData = {
+    weekData: [],
+    yearData: [],
+    entries: []
   };
 
   deletePassword = '';
@@ -87,6 +102,7 @@ export class HomePage implements AfterViewInit {
     private friendService: FriendService,
     private weightService: WeightService
   ) {
+    this.fetchUserdata();
     this.fetchExerciseTypes();
 
     this.authService.getCountries()
@@ -149,6 +165,7 @@ export class HomePage implements AfterViewInit {
 
     this.authService.getUserdata(accessToken).subscribe(
       res => {
+        this.userData.user_id = res.user_id;
         this.userData.username = res.username;
         this.userData.email = res.email;
         this.userData.gender = res.gender.gender_type;
@@ -254,29 +271,19 @@ export class HomePage implements AfterViewInit {
   }
 
   ionViewWillEnter() {
+    this.pageIsLoading = true;
+
     this.fetchUserdata();
 
     this.fetchLeaderboardAll();
     this.fetchLeaderboardFriends();
 
+    this.fetchFriendlist();
     this.fetchFriendRequests();
-
-    //this.xLabel = [];
-    //this.yData = [];
-
-    for (let i = 0; i < 14; i++) {
-      //this.add();
-    }
   }
 
   ngAfterViewInit() {
-    //this.yData = [5,null,15,40];
-    //this.xLabel = ['1', '2', '3', '4'];
     this.lineChartMethod();
-
-    for (let i = 0; i < 14; i++) {
-      this.add();
-    }
 
     let currDate;
 
@@ -284,32 +291,8 @@ export class HomePage implements AfterViewInit {
       currDate = new Date();
       currDate.setDate(currDate.getDate()-i);
       this.xLabel.push(format(currDate, 'dd MMM'));
+      this.dates.push(currDate.getDate());
     }
-
-  }
-
-  add() {
-    //this.xLabel.push('12. Jan');
-    this.yData.push(Math.floor(Math.random() * (100 - 70 + 1) + 70));
-
-    this.lineChart.destroy();
-    this.lineChartMethod();
-  }
-
-  async testing() {
-
-    const dates = [];
-    let currDate = new Date();
-
-    const accessToken = await (await Storage.get({ key: 'access_token' })).value;
-
-    for (let i = 13; i >= 0; i--) {
-      currDate = new Date();
-      currDate.setDate(currDate.getDate()-i);
-      dates.push(format(currDate, 'dd MMM'));
-    }
-
-    this.alertService.presentSimpleAlert('Test', dates);
   }
 
   dismissModal() {
@@ -357,8 +340,49 @@ export class HomePage implements AfterViewInit {
       .subscribe(
         res => {
           this.friendRequests = res.data;
+          this.pageIsLoading = false;
         }
       );
+  }
+
+  async fetchFriendlist() {
+    const accessToken = await (await Storage.get({ key: 'access_token' })).value;
+
+    this.friendService.getFriendlist(accessToken)
+      .subscribe(
+        res => this.friendList = res.data
+      );
+  }
+
+  async getTrainingData() {
+    const accessToken = await (await Storage.get({ key: 'access_token' })).value;
+
+    this.trainingService.getTrainingEntries(this.selectedExerciseId, accessToken)
+      .subscribe(res => this.trainingData.entries = res.data);
+
+    this.trainingService.getTrainingWeek(this.selectedExerciseId, accessToken)
+      .subscribe(res => {
+        this.trainingData.weekData = res.data;
+
+        this.yData = new Array(14).fill(null);;
+
+        this.trainingData.weekData.forEach(elem => {
+          this.dates.forEach((value, index) => {
+            if(elem.day === value) {
+              this.yData[index] = elem.max_weight;
+            }
+          });
+        });
+
+        //this.yData = this.presentWeekData;
+        this.lineChart.destroy();
+        this.lineChartMethod();
+      });
+
+    this.trainingService.getTrainingYear(this.selectedExerciseId, accessToken)
+      .subscribe(res => this.trainingData.yearData = res.data);
+
+
   }
 
   async fetchLeaderboardAll() {
@@ -383,9 +407,22 @@ export class HomePage implements AfterViewInit {
       );
   }
 
+  routeToExerciseDetail() {
+    if(this.selectedExerciseId !== 0) {
+      this.router.navigate(['exercise-detail'], {
+        state: {
+          selectedExercise: this.selectedExerciseId,
+          trainingData: this.trainingData,
+          exerciseTypes: this.exerciseTypes
+        }
+      });
+    }
+  }
+
   routeToFriends() {
     this.router.navigate(['friends'], {
       state: {
+        list: this.friendList,
         requests: this.friendRequests
       }
     });

@@ -16,6 +16,7 @@ export class FriendsPage implements OnInit {
 
   friendUsername = '';
 
+  friendList = [];
   friendRequests = [];
 
   constructor(
@@ -29,6 +30,7 @@ export class FriendsPage implements OnInit {
 
   ngOnInit() {
     const routerState = this.router.getCurrentNavigation().extras.state;
+    this.friendList = routerState.list;
     this.friendRequests = routerState.requests;
   }
 
@@ -54,5 +56,33 @@ export class FriendsPage implements OnInit {
           this.alertService.presentSimpleAlert('Error', err.error.message);
         }
       );
+  }
+
+  async accept(currReq) {
+    const accessToken = await (await Storage.get({ key: 'access_token' })).value;
+
+    this.friendService.acceptReq(currReq.user_id, accessToken).subscribe(
+      () => {
+        this.friendList.push(currReq);
+        this.friendRequests = this.friendRequests.filter(req => req !== currReq);
+      }
+    );
+  }
+
+  async decline(currReq) {
+    const accessToken = await (await Storage.get({ key: 'access_token' })).value;
+
+    this.friendService.declineReq(currReq.user_id, accessToken)
+      .subscribe(
+        () => this.friendRequests = this.friendRequests.filter(req => req !== currReq)
+      );
+  }
+
+  async remove(currFriend) {
+    const accessToken = await (await Storage.get({ key: 'access_token' })).value;
+
+    this.friendService.removeFriend(currFriend.user_id, accessToken).subscribe(
+      () => this.friendList = this.friendList.filter(f => f !== currFriend)
+    );
   }
 }

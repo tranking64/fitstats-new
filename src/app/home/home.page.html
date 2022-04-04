@@ -237,7 +237,7 @@
       </ion-button>
     </ion-buttons>
 
-    <ion-progress-bar value="0.3"></ion-progress-bar> <!--type="indeterminate"-->
+    <ion-progress-bar *ngIf="pageIsLoading" type="indeterminate"></ion-progress-bar>
   </ion-toolbar>
 </ion-header>
 
@@ -258,7 +258,7 @@
           <ion-card-subtitle>
             <ion-item class="ion-no-padding">
               <ion-label class="ion-margin-start">Exercise type</ion-label>
-              <ion-select placeholder="None" [(ngModel)]="selectedExercise">
+              <ion-select (ionChange)="getTrainingData()" placeholder="None" [(ngModel)]="selectedExerciseId">
                 <div *ngFor="let item of sortAfterNameExercises(exerciseTypes)">
                   <ion-select-option value="{{ item.exercise_type_id }}">{{ item.exercise_type }}</ion-select-option>
                 </div>
@@ -266,10 +266,20 @@
             </ion-item>
           </ion-card-subtitle>
 
-          <ion-card-content routerLink="/exercise-detail">
-            <canvas #lineCanvas style="height:200px"></canvas>
-            <!--<div *ngIf="selectedExercise === 0" class="ion-text-center">
-              <ion-text color="warning">Please create some datas for this exercise type!</ion-text>
+          <!-- routerLink="/exercise-detail" -->
+          <ion-card-content (click)="routeToExerciseDetail()">
+            <canvas #lineCanvas style="height: 200px"></canvas>
+
+            <div *ngIf="selectedExerciseId === 0" class="ion-text-center">
+              <ion-text color="warning">Please select an exercise type!</ion-text>
+            </div>
+
+            <div *ngIf="selectedExerciseId !== 0 && trainingData.weekData.length === 0" class="ion-text-center">
+              <ion-text color="warning">Please add some data to this exercise type!</ion-text>
+            </div>
+
+            <!--<div style="" *ngIf="trainingData.weekData.length === 0 && selectedExerciseId === 0" class="ion-text-center">
+              <ion-text color="warning">Please add some data for this exercise type!</ion-text>
             </div>-->
           </ion-card-content>
         </ion-card>
@@ -282,7 +292,7 @@
           <ion-ripple-effect></ion-ripple-effect>
           <ion-card-header>
             <ion-card-title>Friends</ion-card-title>
-            <ion-text>current friends: 11</ion-text>
+            <ion-text>current friends: {{ friendList.length }}</ion-text>
           </ion-card-header>
 
           <ion-card-content *ngIf="friendRequests.length !== 0" class="ion-text-center">
@@ -318,14 +328,25 @@
 
           <ion-card-content>
             <ion-row *ngFor="let item of leaderboardAll.slice(0, 3); index as rank" class="rankings">
-              <ion-col size="2">
+              <ion-col size="2" *ngIf="item.user.user_id === userData.user_id">
+                <b><ion-text color="primary"># {{ rank+1 }}</ion-text></b>
+              </ion-col>
+              <ion-col size="2" *ngIf="item.user.user_id !== userData.user_id">
                 # {{ rank+1 }}
               </ion-col>
-              <ion-col>
-                <span>{{ item.user.username }}</span>
+
+              <ion-col *ngIf="item.user.user_id === userData.user_id">
+                <b><ion-text color="primary">{{ item.user.username }}</ion-text></b>
               </ion-col>
-              <ion-col size="4" class="ion-text-end">
-                <span>{{ item.counter }} units</span>
+              <ion-col *ngIf="item.user.user_id !== userData.user_id">
+                {{ item.user.username }}
+              </ion-col>
+
+              <ion-col size="4" class="ion-text-end" *ngIf="item.user.user_id === userData.user_id">
+                <b><ion-text color="primary">{{ item.counter }} units</ion-text></b>
+              </ion-col>
+              <ion-col size="4" class="ion-text-end" *ngIf="item.user.user_id !== userData.user_id">
+                {{ item.counter }} units
               </ion-col>
             </ion-row>
           </ion-card-content>
@@ -467,9 +488,4 @@
       </ng-template>
     </ion-modal>
   </ion-fab>
-
-  <ion-button (click)="testing()" color="success">
-    Testing
-  </ion-button>
-
 </ion-content>
