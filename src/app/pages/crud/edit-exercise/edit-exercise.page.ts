@@ -17,8 +17,7 @@ export class EditExercisePage implements OnInit {
 
   constructor(
     private modalCtrl: ModalController,
-    private trainingService: TrainingService,
-    private navCtrl: NavController
+    private trainingService: TrainingService
   ) { }
 
   ngOnInit() {
@@ -41,7 +40,6 @@ export class EditExercisePage implements OnInit {
       .subscribe(
         () => {
           this.dismissModal();
-          this.navCtrl.back();
         }
       );
   }

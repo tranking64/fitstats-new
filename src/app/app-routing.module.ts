@@ -35,6 +35,10 @@ const routes: Routes = [
     path: 'edit-exercise',
     loadChildren: () => import('./pages/crud/edit-exercise/edit-exercise.module').then( m => m.EditExercisePageModule)
   },
+  {
+    path: 'edit-weight',
+    loadChildren: () => import('./pages/crud/edit-weight/edit-weight.module').then( m => m.EditWeightPageModule)
+  },
 ];
 
 @NgModule({

@@ -67,9 +67,66 @@
   </ion-grid>
 
   <ion-fab vertical="bottom" horizontal="end" slot="fixed">
-    <ion-fab-button color="secondary" (click)="add()">
+    <ion-fab-button color="primary" id="training-trigger">
       <ion-icon name="barbell"></ion-icon>
     </ion-fab-button>
+
+    <ion-modal trigger="training-trigger" [breakpoints]="[0, 1]" [initialBreakpoint]="1">
+      <ng-template>
+        <ion-header>
+          <ion-toolbar>
+            <ion-title>Add training</ion-title>
+            <ion-buttons slot="end">
+              <ion-button (click)="dismissModal()">Close</ion-button>
+            </ion-buttons>
+          </ion-toolbar>
+        </ion-header>
+
+        <ion-content>
+          <ion-grid>
+            <ion-row>
+              <ion-col>
+                <ion-item>
+                  <ion-label position="stacked">Amount of reps</ion-label>
+                  <ion-input inputmode="decimal" placeholder="Enter your repetitions" [(ngModel)]="tmpTraining.reps"></ion-input>
+                </ion-item>
+              </ion-col>
+            </ion-row>
+            <ion-row>
+              <ion-col>
+                <ion-item>
+                  <ion-label position="stacked">Used weight</ion-label>
+                  <ion-input inputmode="decimal" placeholder="Enter your training weight" [(ngModel)]="tmpTraining.weight"></ion-input>
+                </ion-item>
+              </ion-col>
+            </ion-row>
+            <ion-row>
+              <ion-col>
+                <ion-item>
+                  <ion-label position="stacked">Executed at</ion-label>
+                  <ion-input placeholder="Enter date of execution" id="executed-at-modal" [(ngModel)]="formattedDateExecuted"></ion-input>
+                </ion-item>
+
+                <ion-modal class="bday-modal" trigger="executed-at-modal">
+                  <ng-template>
+                    <ion-content force-overscroll="false">
+                      <ion-datetime locale="en-EN" #datetime presentation="date" [value]="tmpTraining.executed_at" (ionChange)="dateChangedExecute(datetime.value)" showDefaultButtons="true"></ion-datetime>
+                    </ion-content>
+                  </ng-template>
+                </ion-modal>
+              </ion-col>
+            </ion-row>
+            <ion-row>
+              <ion-col class="ion-text-center">
+                <ion-button color="primary" (click)="addTraining()" style="width: 100%;">
+                  Create
+                </ion-button>
+              </ion-col>
+            </ion-row>
+          </ion-grid>
+        </ion-content>
+      </ng-template>
+    </ion-modal>
   </ion-fab>
 </ion-content>
 

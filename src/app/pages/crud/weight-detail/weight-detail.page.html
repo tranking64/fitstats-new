@@ -9,7 +9,7 @@
 </ion-header>
 
 <ion-content>
-  <ion-segment (ionChange)="segmentChanged()" value="week">
+  <ion-segment (ionChange)="segmentChanged()" [value]="selectedSegment">
     <ion-segment-button value="week">
       <ion-label>Last 14 days</ion-label>
     </ion-segment-button>
@@ -41,87 +41,21 @@
           </ion-card-header>
 
           <ion-card-content>
-            <div>
-              <ion-row class="listing">
-                <ion-col size="5">22 March</ion-col>
-                <ion-col>40kg</ion-col>
-                <ion-col class="ion-text-end">
-                  <ion-icon name="pencil"></ion-icon>
-                  <ion-icon color="danger" name="trash"></ion-icon>
-                </ion-col>
-              </ion-row>
-
-              <ion-row class="listing">
-                <ion-col size="5">21 March</ion-col>
-                <ion-col>42.5kg</ion-col>
-                <ion-col class="ion-text-end">
-                  <ion-icon name="pencil"></ion-icon>
-                  <ion-icon color="danger" name="trash"></ion-icon>
-                </ion-col>
-              </ion-row>
-
-              <ion-row class="listing">
-                <ion-col size="5">20 March</ion-col>
-                <ion-col>45kg</ion-col>
-                <ion-col class="ion-text-end">
-                  <ion-icon name="pencil"></ion-icon>
-                  <ion-icon color="danger" name="trash"></ion-icon>
-                </ion-col>
-              </ion-row>
-
-              <ion-row class="listing">
-                <ion-col size="5">19 March</ion-col>
-                <ion-col>40kg</ion-col>
-                <ion-col class="ion-text-end">
-                  <ion-icon name="pencil"></ion-icon>
-                  <ion-icon color="danger" name="trash"></ion-icon>
-                </ion-col>
-              </ion-row>
-
-              <ion-row class="listing">
-                <ion-col size="5">18 March</ion-col>
-                <ion-col>42.5kg</ion-col>
-                <ion-col class="ion-text-end">
-                  <ion-icon name="pencil"></ion-icon>
-                  <ion-icon color="danger" name="trash"></ion-icon>
-                </ion-col>
-              </ion-row>
-
-              <ion-row class="listing">
-                <ion-col size="5">17 March</ion-col>
-                <ion-col>45kg</ion-col>
-                <ion-col class="ion-text-end">
-                  <ion-icon name="pencil"></ion-icon>
-                  <ion-icon color="danger" name="trash"></ion-icon>
-                </ion-col>
-              </ion-row>
-
             <ion-row class="listing">
-              <ion-col size="5">16 March</ion-col>
-              <ion-col>40kg</ion-col>
-              <ion-col class="ion-text-end">
-                <ion-icon name="pencil"></ion-icon>
-                <ion-icon color="danger" name="trash"></ion-icon>
-              </ion-col>
+              <ion-col size="5">Date</ion-col>
+              <ion-col>Weight</ion-col>
+              <ion-col class="ion-text-end">Actions</ion-col>
             </ion-row>
 
-            <ion-row class="listing">
-              <ion-col size="5">15 March</ion-col>
-              <ion-col>64.3kg</ion-col>
-              <ion-col class="ion-text-end">
-                <ion-icon name="pencil"></ion-icon>
-                <ion-icon color="danger" name="trash"></ion-icon>
-              </ion-col>
-            </ion-row>
-
-            <ion-row class="listing">
-              <ion-col size="5">14 March</ion-col>
-              <ion-col>65kg</ion-col>
-              <ion-col class="ion-text-end">
-                <ion-icon name="pencil"></ion-icon>
-                <ion-icon color="danger" name="trash"></ion-icon>
-              </ion-col>
-            </ion-row>
+            <div *ngFor="let item of weightData.entries">
+              <ion-row class="listing">
+                <ion-col size="5">{{ formatDate(item.weighted_date) }}</ion-col>
+                <ion-col>{{ item.amount }}kg</ion-col>
+                <ion-col class="ion-text-end">
+                  <ion-icon (click)="presentEditModal(item)" name="pencil"></ion-icon>
+                  <ion-icon (click)="deleteEntry(item)" color="danger" name="trash"></ion-icon>
+                </ion-col>
+              </ion-row>
             </div>
           </ion-card-content>
         </ion-card>
@@ -130,8 +64,57 @@
   </ion-grid>
 
   <ion-fab vertical="bottom" horizontal="end" slot="fixed">
-    <ion-fab-button color="secondary" (click)="add()">
+    <ion-fab-button id="weight-trigger" color="primary">
       <ion-icon name="scale"></ion-icon>
     </ion-fab-button>
+
+    <ion-modal trigger="weight-trigger" [breakpoints]="[0, 1]" [initialBreakpoint]="1">
+      <ng-template>
+        <ion-header>
+          <ion-toolbar>
+            <ion-title>Add weight</ion-title>
+            <ion-buttons slot="end">
+              <ion-button (click)="dismissModal()">Close</ion-button>
+            </ion-buttons>
+          </ion-toolbar>
+        </ion-header>
+
+        <ion-content>
+          <ion-grid>
+            <ion-row>
+              <ion-col>
+                <ion-item>
+                  <ion-label position="stacked">Bodyweight</ion-label>
+                  <ion-input inputmode="decimal" placeholder="Enter your body weight" [(ngModel)]="tmpWeight.weight"></ion-input>
+                </ion-item>
+              </ion-col>
+            </ion-row>
+            <ion-row>
+              <ion-col>
+                <ion-item>
+                  <ion-label position="stacked">Weighted at</ion-label>
+                  <ion-input placeholder="Enter weighted at date" id="weighted-at-modal" [(ngModel)]="formattedDateWeighted"></ion-input>
+                </ion-item>
+
+                <ion-modal class="bday-modal" trigger="weighted-at-modal">
+                  <ng-template>
+                    <ion-content force-overscroll="false">
+                      <ion-datetime locale="en-EN" #datetime presentation="date" [value]="tmpWeight.weighted_at" (ionChange)="dateChangedWeighted(datetime.value)" showDefaultButtons="true"></ion-datetime>
+                    </ion-content>
+                  </ng-template>
+                </ion-modal>
+              </ion-col>
+            </ion-row>
+            <ion-row>
+              <ion-col class="ion-text-center">
+                <ion-button color="primary" (click)="addWeight()" style="width: 100%;">
+                  Create
+                </ion-button>
+              </ion-col>
+            </ion-row>
+          </ion-grid>
+        </ion-content>
+      </ng-template>
+    </ion-modal>
   </ion-fab>
 </ion-content>

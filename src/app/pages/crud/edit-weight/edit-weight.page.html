@@ -1,0 +1,44 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-title>Weight entry #{{ weightData.bodyweight_id }}</ion-title>
+    <ion-buttons slot="end">
+      <ion-button (click)="dismissModal()">Close</ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <ion-grid>
+    <ion-row>
+      <ion-col>
+        <ion-item>
+          <ion-label position="stacked">Bodyweight</ion-label>
+          <ion-input inputmode="decimal" placeholder="Enter your body weight" [(ngModel)]="weightData.amount"></ion-input>
+        </ion-item>
+      </ion-col>
+    </ion-row>
+    <ion-row>
+      <ion-col>
+        <ion-item>
+          <ion-label position="stacked">Weighted at</ion-label>
+          <ion-input placeholder="Enter weighted at date" id="weighted-at-modal" [(ngModel)]="formattedDateWeighted"></ion-input>
+        </ion-item>
+
+        <ion-modal class="bday-modal" trigger="weighted-at-modal">
+          <ng-template>
+            <ion-content force-overscroll="false">
+              <ion-datetime locale="en-EN" #datetime presentation="date" [value]="weightData.weighted_date" (ionChange)="dateChangedWeighted(datetime.value)" showDefaultButtons="true"></ion-datetime>
+            </ion-content>
+          </ng-template>
+        </ion-modal>
+      </ion-col>
+    </ion-row>
+    <ion-row>
+      <ion-col class="ion-text-center">
+        <ion-button color="primary" (click)="update()" style="width: 100%;">
+          Save changes
+        </ion-button>
+      </ion-col>
+    </ion-row>
+  </ion-grid>
+</ion-content>

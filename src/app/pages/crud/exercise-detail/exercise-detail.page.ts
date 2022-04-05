@@ -1,11 +1,13 @@
+/* eslint-disable @typescript-eslint/naming-convention */
 import { AfterViewInit, Component, ElementRef, OnInit, ViewChild } from '@angular/core';
 import { Router } from '@angular/router';
 import { Chart, registerables } from 'chart.js';
-import { format } from 'date-fns';
+import { format, parseISO } from 'date-fns';
 import { TrainingService } from 'src/app/services/api/crud/training.service';
 import { Storage } from '@capacitor/storage';
 import { ModalController } from '@ionic/angular';
 import { EditExercisePage } from '../edit-exercise/edit-exercise.page';
+import { ToastService } from 'src/app/services/helpers/toast.service';
 
 @Component({
   selector: 'app-exercise-detail',
@@ -19,6 +21,15 @@ export class ExerciseDetailPage implements AfterViewInit, OnInit {
   lineChart: any;
   xLabel = [];
   yData = [];
+
+  formattedDateExecuted = format(parseISO(new Date().toISOString()), 'dd MMMM yyyy');
+
+  tmpTraining =  {
+    exercise_type_id: null,
+    reps: '',
+    weight: '',
+    executed_at: format(new Date(), 'yyyy-MM-dd')
+  };
 
   selectedSegment = 'week';
 
@@ -35,10 +46,12 @@ export class ExerciseDetailPage implements AfterViewInit, OnInit {
   constructor(
     private router: Router,
     private trainingService: TrainingService,
-    private modalCtrl: ModalController
+    private modalCtrl: ModalController,
+    private toastService: ToastService
   ) {
     Chart.register(...registerables);
   }
+
   ngOnInit() {
     const routerState = this.router.getCurrentNavigation().extras.state;
     this.selectedExercise = routerState.selectedExercise;
@@ -52,18 +65,82 @@ export class ExerciseDetailPage implements AfterViewInit, OnInit {
     });
   }
 
+  async getTrainingData() {
+    const accessToken = await (await Storage.get({ key: 'access_token' })).value;
+
+    this.trainingService.getTrainingEntries(this.selectedExercise, accessToken)
+      .subscribe(res => this.trainingData.entries = res.data);
+
+    this.trainingService.getTrainingWeek(this.selectedExercise, accessToken)
+      .subscribe(res => {
+        this.trainingData.weekData = res.data;
+
+        /*this.yData = new Array(14).fill(null);;
+
+        this.trainingData.weekData.forEach(elem => {
+          this.dates.forEach((value, index) => {
+            if(elem.day === value) {
+              this.yData[index] = elem.max_weight;
+            }
+          });
+        });
+
+        this.lineChart.destroy();
+        this.lineChartMethod();*/
+      });
+
+    this.trainingService.getTrainingYear(this.selectedExercise, accessToken)
+      .subscribe(res => {
+        this.trainingData.yearData = res.data;
+
+        if (this.selectedSegment === 'week') {
+          this.selectedSegment = 'year';
+        }
+        else {
+          this.selectedSegment = 'week';
+        }
+        this.segmentChanged();
+      });
+
+  }
+
+  async addTraining() {
+    const accessToken = await (await Storage.get({ key: 'access_token' })).value;
+
+    this.tmpTraining.exercise_type_id = this.selectedExercise;
+
+    this.trainingService.createTraining(this.tmpTraining, accessToken)
+      .subscribe(
+        res => {
+          this.dismissModal();
+          this.getTrainingData();
+          this.toastService.presentToast('success', 'Successfully added training!');
+
+          //this.formattedDateExecuted = '';
+        }
+      );
+  }
+
   async deleteEntry(currExercise) {
     const accessToken = await (await Storage.get({ key: 'access_token' })).value;
 
     console.log(currExercise);
     this.trainingService.deleteTraining(currExercise.exercise_id, accessToken)
       .subscribe(
-        () => this.trainingData.entries = this.trainingData.entries.filter(e => e !== currExercise)
+        () => {
+          this.trainingData.entries = this.trainingData.entries.filter(e => e !== currExercise);
+          this.getTrainingData();
+        }
       );
   }
 
   dismissModal() {
     this.modalCtrl.dismiss();
+  }
+
+  dateChangedExecute(value) {
+    this.tmpTraining.executed_at = value;
+    this.formattedDateExecuted = format(parseISO(value), 'dd MMMM yyyy');
   }
 
   async presentEditModal(currExercise) {
@@ -77,6 +154,8 @@ export class ExerciseDetailPage implements AfterViewInit, OnInit {
     });
     //this.editExercise = currExercise;
     await modal.present();
+
+    modal.onDidDismiss().then(() => this.getTrainingData());
   }
 
   ngAfterViewInit() {
@@ -112,6 +191,7 @@ export class ExerciseDetailPage implements AfterViewInit, OnInit {
   segmentChanged() {
     if(this.selectedSegment === 'week') {
       this.xLabel = [];
+      this.months = [];
       let currDate;
 
       for (let i = 11; i >= 0; i--) {

@@ -302,7 +302,7 @@
       </ion-col>
 
       <ion-col size="5">
-        <ion-card class="ion-no-margin ion-activatable ripple-parent" style="height: 100%;" routerLink="/weight-detail">
+        <ion-card class="ion-no-margin ion-activatable ripple-parent" style="height: 100%;" (click)="routeToWeightDetail()">
           <ion-ripple-effect></ion-ripple-effect>
           <ion-card-header>
             <ion-card-title class="ion-text-center">Weight</ion-card-title>
@@ -311,7 +311,17 @@
 
           <ion-card-content>
             <ion-text color="primary" class="ion-text-center">
-              <h1><ion-icon name="arrow-up"></ion-icon> 1.5kg</h1>
+              <div *ngIf="weightData.weekData.length > 1">
+                <h1 *ngIf="checkNegative(weightData.weightDiff) === false"><ion-icon name="arrow-up"></ion-icon> {{ weightData.weightDiff }}kg</h1>
+                <h1 *ngIf="checkNegative(weightData.weightDiff) === true"><ion-icon name="arrow-down"></ion-icon> {{ getPositive(weightData.weightDiff) }}kg</h1>
+                <h1 *ngIf="weightData.weightDiff === '0.0'">{{ weightData.weekData[weightData.weekData.length-1].max_weight }}kg</h1>
+              </div>
+              <div *ngIf="weightData.weekData.length === 1">
+                <h1>{{ weightData.weekData[0].max_weight }}kg</h1>
+              </div>
+            </ion-text>
+            <ion-text *ngIf="weightData.weekData.length === 0" color="warning" class="ion-text-center">
+              <h2>no data</h2>
             </ion-text>
           </ion-card-content>
         </ion-card>

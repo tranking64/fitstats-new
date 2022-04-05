@@ -81,6 +81,13 @@ export class HomePage implements AfterViewInit {
     entries: []
   };
 
+  weightData = {
+    weekData: [],
+    yearData: [],
+    entries: [],
+    weightDiff: null
+  };
+
   deletePassword = '';
 
   exerciseTypes = [];
@@ -110,6 +117,8 @@ export class HomePage implements AfterViewInit {
 
     this.authService.getGenders()
       .subscribe(data => this.genders = data.data);
+
+    this.getWeightData();
 
     Chart.register(...registerables);
   }
@@ -280,6 +289,12 @@ export class HomePage implements AfterViewInit {
 
     this.fetchFriendlist();
     this.fetchFriendRequests();
+
+    if(this.selectedExerciseId !== 0) {
+      this.getTrainingData();
+    }
+
+    this.getWeightData();
   }
 
   ngAfterViewInit() {
@@ -382,7 +397,41 @@ export class HomePage implements AfterViewInit {
     this.trainingService.getTrainingYear(this.selectedExerciseId, accessToken)
       .subscribe(res => this.trainingData.yearData = res.data);
 
+  }
 
+  async getWeightData() {
+    const accessToken = await (await Storage.get({ key: 'access_token' })).value;
+
+    this.weightService.getWeightEntries(accessToken)
+      .subscribe(res => this.weightData.entries = res.data);
+
+    this.weightService.getWeightWeek(accessToken)
+      .subscribe(res => {
+        this.weightData.weekData = res.data;
+        if(this.weightData.weekData.length > 1) {
+          // eslint-disable-next-line max-len
+          this.weightData.weightDiff =  Number(this.weightData.weekData[this.weightData.weekData.length-1].max_weight - this.weightData.weekData[this.weightData.weekData.length-2].max_weight).toFixed(1);
+          console.log(this.weightData.weightDiff);
+        }
+
+      });
+
+    this.weightService.getWeightYear(accessToken)
+      .subscribe(res => this.weightData.yearData = res.data);
+
+  }
+
+  checkNegative(weight) {
+    if (String(weight).substring(0, 1) === '-') {
+      return true;
+    }
+    else {
+      return false;
+    }
+  }
+
+  getPositive(weight) {
+    return String(weight).substring(1);
   }
 
   async fetchLeaderboardAll() {
@@ -419,6 +468,14 @@ export class HomePage implements AfterViewInit {
     }
   }
 
+  routeToWeightDetail() {
+    this.router.navigate(['weight-detail'], {
+      state: {
+        weightData: this.weightData
+      }
+    });
+  }
+
   routeToFriends() {
     this.router.navigate(['friends'], {
       state: {
@@ -432,7 +489,8 @@ export class HomePage implements AfterViewInit {
     this.router.navigate(['leaderboard'], {
       state: {
         all: this.leaderboardAll,
-        friends: this.leaderboardFriends
+        friends: this.leaderboardFriends,
+        myUserId: this.userData.user_id
       }
     });
   }

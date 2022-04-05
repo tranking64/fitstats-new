@@ -13,12 +13,15 @@ export class LeaderboardPage implements OnInit {
   leaderboardAll = [];
   leaderboardFriends = [];
 
+  myUserId;
+
   constructor(private router: Router) { }
 
   ngOnInit() {
     const routerState = this.router.getCurrentNavigation().extras.state;
     this.leaderboardAll = routerState.all;
     this.leaderboardFriends = routerState.friends;
+    this.myUserId = routerState.myUserId;
   }
 
 }
