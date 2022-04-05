@@ -403,18 +403,17 @@ export class HomePage implements AfterViewInit {
     const accessToken = await (await Storage.get({ key: 'access_token' })).value;
 
     this.weightService.getWeightEntries(accessToken)
-      .subscribe(res => this.weightData.entries = res.data);
+      .subscribe(res => {
+        this.weightData.entries = res.data;
+
+        if(this.weightData.entries.length > 1) {
+          // eslint-disable-next-line max-len
+          this.weightData.weightDiff =  Number(this.weightData.entries[0].amount - this.weightData.entries[1].amount).toFixed(1);
+        }
+      });
 
     this.weightService.getWeightWeek(accessToken)
-      .subscribe(res => {
-        this.weightData.weekData = res.data;
-        if(this.weightData.weekData.length > 1) {
-          // eslint-disable-next-line max-len
-          this.weightData.weightDiff =  Number(this.weightData.weekData[0].max_weight - this.weightData.weekData[1].max_weight).toFixed(1);
-          console.log(this.weightData.weightDiff);
-        }
-
-      });
+      .subscribe(res => this.weightData.weekData = res.data);
 
     this.weightService.getWeightYear(accessToken)
       .subscribe(res => this.weightData.yearData = res.data);
