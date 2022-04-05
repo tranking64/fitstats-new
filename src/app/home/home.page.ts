@@ -410,7 +410,7 @@ export class HomePage implements AfterViewInit {
         this.weightData.weekData = res.data;
         if(this.weightData.weekData.length > 1) {
           // eslint-disable-next-line max-len
-          this.weightData.weightDiff =  Number(this.weightData.weekData[this.weightData.weekData.length-1].max_weight - this.weightData.weekData[this.weightData.weekData.length-2].max_weight).toFixed(1);
+          this.weightData.weightDiff =  Number(this.weightData.weekData[0].max_weight - this.weightData.weekData[1].max_weight).toFixed(1);
           console.log(this.weightData.weightDiff);
         }
 

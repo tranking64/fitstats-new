@@ -312,8 +312,10 @@
           <ion-card-content>
             <ion-text color="primary" class="ion-text-center">
               <div *ngIf="weightData.weekData.length > 1">
-                <h1 *ngIf="checkNegative(weightData.weightDiff) === false"><ion-icon name="arrow-up"></ion-icon> {{ weightData.weightDiff }}kg</h1>
-                <h1 *ngIf="checkNegative(weightData.weightDiff) === true"><ion-icon name="arrow-down"></ion-icon> {{ getPositive(weightData.weightDiff) }}kg</h1>
+                <div *ngIf="weightData.weightDiff !== '0.0'">
+                  <h1 *ngIf="checkNegative(weightData.weightDiff) === false"><ion-icon name="arrow-up"></ion-icon> {{ weightData.weightDiff }}kg</h1>
+                  <h1 *ngIf="checkNegative(weightData.weightDiff) === true"><ion-icon name="arrow-down"></ion-icon> {{ getPositive(weightData.weightDiff) }}kg</h1>
+                </div>
                 <h1 *ngIf="weightData.weightDiff === '0.0'">{{ weightData.weekData[weightData.weekData.length-1].max_weight }}kg</h1>
               </div>
               <div *ngIf="weightData.weekData.length === 1">
